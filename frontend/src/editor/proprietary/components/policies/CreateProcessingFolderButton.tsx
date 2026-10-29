@@ -10,9 +10,12 @@ export function CreateProcessingFolderButton() {
   const { t } = useTranslation();
   const creation = useProcessingFolderCreation();
   // Folder processing runs against the connected account; signed out there is nowhere
-  // to run it, so the CTA shows disabled with a prompt to sign in rather than opening a
-  // wizard that would dead-end.
+  // to run it, so we don't render this confusing button in standalone web builds.
   const signedIn = usePoliciesEnabled();
+  if (!signedIn) {
+    return null;
+  }
+
   const label = t("processingFolders.setup.title");
   return (
     <>

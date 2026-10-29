@@ -38,12 +38,9 @@ describe("CreateProcessingFolderButton", () => {
     expect(open).toHaveBeenCalledTimes(1);
   });
 
-  it("disables the button when signed out", () => {
+  it("renders nothing when signed out", () => {
     signedIn.value = false;
     renderButton();
-    const button = screen.getByRole("button");
-    expect(button).toBeDisabled();
-    fireEvent.click(button);
-    expect(open).not.toHaveBeenCalled();
+    expect(screen.queryByRole("button")).toBeNull();
   });
 });
