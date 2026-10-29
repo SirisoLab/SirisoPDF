@@ -1,0 +1,116 @@
+plugins {
+    id 'application'
+    id 'com.diffplug.spotless' version '8.8.0'
+    id 'com.github.jk1.dependency-license-report' version '3.1.4'
+}
+
+repositories { mavenCentral() }
+
+def cefVersion = '152.0.6'
+def backendJarPath = providers.gradleProperty('backendJar').orElse(providers.environmentVariable('STIRLING_CEF_BACKEND_JAR'))
+def platformName = providers.gradleProperty('cefPlatform').getOrElse(
+    (System.getProperty('os.name').toLowerCase().contains('win') ? 'windows' :
+        System.getProperty('os.name').toLowerCase().contains('mac') ? 'macosx' : 'linux') +
+    (System.getProperty('os.arch') in ['aarch64', 'arm64'] ? '-arm64' : '-amd64'))
+
+dependencies {
+    implementation "me.friwi:jcefmaven:${cefVersion}"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.14.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(25) } }
+
+application {
+    mainClass = 'stirling.cef.Launcher'
+    applicationDefaultJvmArgs = ['--enable-native-access=ALL-UNNAMED']
+    if (System.getProperty('os.name').toLowerCase().contains('mac')) {
+        applicationDefaultJvmArgs += ['--add-opens=java.desktop/sun.awt=ALL-UNNAMED',
+            '--add-opens=java.desktop/sun.lwawt=ALL-UNNAMED',
+            '--add-opens=java.desktop/sun.lwawt.macosx=ALL-UNNAMED']
+    }
+}
+
+// Resolve the matching native tag from the pinned JCEF API, rather than maintaining two versions.
+configurations { cefNatives }
+afterEvaluate {
+    def api = configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.find {
+        it.moduleVersion.id.group == 'me.friwi' && it.name == 'jcef-api'
+    }
+    dependencies.add('cefNatives', "me.friwi:jcef-natives-${platformName}:${api.moduleVersion.id.version}")
+}
+tasks.named('startScripts') { classpath += configurations.cefNatives }
+
+test { useJUnitPlatform() }
+spotless {
+    java {
+        googleJavaFormat('1.35.0').aosp()
+        target 'src/**/*.java'
+    }
+}
+licenseReport {
+    outputDir = "${layout.buildDirectory.get()}/dependency-licenses"
+    configurations = ['runtimeClasspath', 'cefNatives']
+}
+tasks.register('checkLauncher') {
+    group = 'verification'
+    description = 'Check the CEF launcher'
+    dependsOn check
+}
+
+distributions {
+    main {
+        contents {
+            from(configurations.cefNatives) { into 'lib' }
+            from('../../LICENSE') { into 'licenses/stirling' }
+            from('README.md')
+            from('launcher.properties.example')
+            from('../../docs/ARCHITECTURE_NATIVE_ASSESSMENT.md') { into 'licenses' }
+            from('THIRD_PARTY.md') { into 'licenses' }
+            from(tasks.named('generateLicenseReport')) { into 'licenses/dependencies' }
+            if (backendJarPath.isPresent()) {
+                from(backendJarPath) {
+                    into 'backend'
+                    rename { 'stirling-pdf.jar' }
+                }
+            }
+        }
+    }
+}
+
+tasks.register('packageDesktop') {
+    group = 'distribution'
+    description = 'Package the CEF desktop application'
+    dependsOn check, distZip, 'verifyNativeBundle'
+}
+
+tasks.register('verifyNativeBundle', JavaExec) {
+    group = 'verification'
+    description = 'Verify the packaged CEF runtime'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath + configurations.cefNatives
+    mainClass = 'stirling.cef.NativeBundleCheck'
+    args layout.buildDirectory.dir('verified-jcef').get().asFile.absolutePath
+}
+
+tasks.register('validateBackend') {
+    doLast {
+        def backend = backendJarPath
+        if (!backend.isPresent() || !file(backend.get()).isFile()) {
+            throw new GradleException('Supply -PbackendJar=/absolute/path/to/core-web.jar')
+        }
+        def archive = new java.util.zip.ZipFile(file(backend.get()))
+        try {
+            def entries = archive.entries().toList()*.name
+            if (!entries.contains('BOOT-INF/classes/static/index.html') ||
+                !entries.any { it.startsWith('BOOT-INF/classes/static/assets/') && it.endsWith('.js') } ||
+                entries.any { it.startsWith('BOOT-INF/lib/proprietary-') || it.startsWith('BOOT-INF/lib/saas-') }) {
+                throw new GradleException('A core JAR with bundled web UI is required; run task native:build')
+            }
+        } finally { archive.close() }
+    }
+}
+tasks.withType(AbstractArchiveTask).configureEach {
+    if (name in ['distZip', 'distTar']) dependsOn 'validateBackend'
+}
+tasks.named('installDist') { dependsOn 'validateBackend' }

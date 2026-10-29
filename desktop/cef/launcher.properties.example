@@ -1,0 +1,7 @@
+# Paths are relative to this file; omit dataDir to use the OS user-data location.
+backendJar=backend/stirling-pdf.jar
+port=8780
+startupTimeoutSeconds=180
+shutdownTimeoutSeconds=35
+# javaExecutable=C:/Java/jdk-25/bin/java.exe
+# dataDir=C:/Users/you/AppData/Local/SirisoPDF-CEF

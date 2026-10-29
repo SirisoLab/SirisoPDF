@@ -1,0 +1,34 @@
+version: '3'
+
+vars:
+  PYTHON: '{{.PYTHON | default "python"}}'
+
+tasks:
+  smoke:
+    desc: "Verify native PDF operations"
+    cmds:
+      - '{{.PYTHON}} scripts/native/smoke_pdf.py --jar dist/native/stirling-pdf.jar {{.CLI_ARGS}}'
+  doctor:
+    desc: "Check native web prerequisites"
+    cmds:
+      - '{{.PYTHON}} scripts/native/stirling_native.py doctor {{.CLI_ARGS}}'
+  build:
+    desc: "Build the native web application"
+    cmds:
+      - '{{.PYTHON}} scripts/native/stirling_native.py build {{.CLI_ARGS}}'
+  run:
+    desc: "Run the native web application"
+    cmds:
+      - '{{.PYTHON}} scripts/native/stirling_native.py run {{.CLI_ARGS}}'
+  dev:
+    desc: "Develop the native web application"
+    cmds:
+      - '{{.PYTHON}} scripts/native/stirling_native.py dev {{.CLI_ARGS}}'
+  package:
+    desc: "Package the native web application"
+    cmds:
+      - '{{.PYTHON}} scripts/native/stirling_native.py package {{.CLI_ARGS}}'
+  check:
+    desc: "Check native launcher behavior"
+    cmds:
+      - '{{.PYTHON}} -m unittest discover -s scripts/native/tests -v'

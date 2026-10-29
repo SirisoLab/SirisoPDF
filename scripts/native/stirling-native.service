@@ -1,0 +1,24 @@
+[Unit]
+Description=Stirling-PDF native web application
+After=network.target
+
+[Service]
+Type=simple
+User=stirling-pdf
+Group=stirling-pdf
+WorkingDirectory=/opt/stirling-web
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/python3 /opt/stirling-web/scripts/native/stirling_native.py run --config /etc/stirling-pdf/native.json
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=75
+KillMode=mixed
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/stirling-pdf
+
+[Install]
+WantedBy=multi-user.target

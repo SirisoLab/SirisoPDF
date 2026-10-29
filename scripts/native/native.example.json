@@ -1,0 +1,13 @@
+{
+  "jar": "../../dist/native/stirling-pdf.jar",
+  "data_dir": "../../.native-data",
+  "java": "java",
+  "host": "127.0.0.1",
+  "port": 8080,
+  "frontend_port": 5173,
+  "startup_timeout": 180,
+  "shutdown_timeout": 30,
+  "jvm_args": ["-Xmx2g", "-Djava.awt.headless=true"],
+  "application_args": [],
+  "env": {}
+}

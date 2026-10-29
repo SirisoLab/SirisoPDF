@@ -1,0 +1,668 @@
+.siriso-pm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: color-mix(in srgb, var(--p-black) 82%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  animation: sirisoPmFadeIn 0.18s ease-out;
+}
+
+@keyframes sirisoPmFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.siriso-pm-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 860px;
+  max-height: calc(100vh - 2.5rem);
+  overflow-y: auto;
+  border-radius: 1.35rem;
+  background: var(--p-zinc-950);
+  color: var(--p-zinc-100);
+  border: 1px solid color-mix(in srgb, var(--p-siriso-orange-500) 35%, var(--p-zinc-800));
+  box-shadow:
+    0 28px 80px color-mix(in srgb, var(--p-black) 85%, transparent),
+    0 0 48px color-mix(in srgb, var(--p-siriso-orange-500) 14%, transparent);
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.siriso-pm-close {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 5;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--p-white) 6%, var(--p-zinc-900));
+  border: 1px solid color-mix(in srgb, var(--p-white) 12%, transparent);
+  color: var(--p-zinc-250);
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.siriso-pm-close:hover {
+  color: var(--p-white);
+  border-color: color-mix(in srgb, var(--p-siriso-orange-500) 50%, transparent);
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 18%, var(--p-zinc-900));
+}
+
+.siriso-pm-grid {
+  display: grid;
+  grid-template-columns: 0.92fr 1.08fr;
+  min-height: 490px;
+}
+
+.siriso-pm-aside {
+  position: relative;
+  padding: 2rem 1.85rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+  background:
+    radial-gradient(circle at 15% 15%, color-mix(in srgb, var(--p-siriso-orange-500) 20%, transparent), transparent 58%),
+    linear-gradient(165deg, color-mix(in srgb, var(--p-siriso-orange-600) 10%, var(--p-zinc-900)) 0%, var(--p-black) 100%);
+  border-right: 1px solid color-mix(in srgb, var(--p-white) 9%, transparent);
+}
+
+.siriso-pm-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 14%, var(--p-zinc-900));
+  border: 1px solid color-mix(in srgb, var(--p-siriso-orange-500) 40%, transparent);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--p-siriso-orange-400);
+  width: fit-content;
+  margin-bottom: 1rem;
+}
+
+.siriso-pm-eyebrow-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--p-siriso-orange-500);
+  box-shadow: 0 0 8px var(--p-siriso-orange-500);
+}
+
+.siriso-pm-title {
+  font-family: "Syne", "Plus Jakarta Sans", sans-serif;
+  font-weight: 800;
+  font-size: 1.65rem;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: var(--p-white);
+  margin: 0 0 0.5rem;
+}
+
+.siriso-pm-subtitle {
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--p-zinc-300);
+  margin: 0 0 1.25rem;
+}
+
+.siriso-pm-price-box {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 12%, var(--p-zinc-900));
+  border: 1px solid color-mix(in srgb, var(--p-siriso-orange-500) 38%, transparent);
+  margin-bottom: 1.25rem;
+}
+
+.siriso-pm-price-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--p-zinc-300);
+}
+
+.siriso-pm-price-value {
+  font-family: "Syne", "Plus Jakarta Sans", sans-serif;
+  font-weight: 800;
+  font-size: 1.28rem;
+  color: var(--p-siriso-orange-400);
+}
+
+.siriso-pm-perks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.siriso-pm-perk {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.siriso-pm-perk-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.6rem;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 16%, var(--p-zinc-900));
+  border: 1px solid color-mix(in srgb, var(--p-siriso-orange-500) 35%, transparent);
+  color: var(--p-siriso-orange-400);
+}
+
+.siriso-pm-perk-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--p-white);
+  margin: 0 0 0.15rem;
+}
+
+.siriso-pm-perk-desc {
+  font-size: 0.77rem;
+  line-height: 1.45;
+  color: var(--p-zinc-400);
+  margin: 0;
+}
+
+.siriso-pm-aside-foot {
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--p-white) 8%, transparent);
+  font-size: 0.75rem;
+  color: var(--p-zinc-400);
+  line-height: 1.5;
+}
+
+.siriso-pm-main {
+  padding: 2.95rem 2rem 1.85rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.25rem;
+  background: var(--p-zinc-950);
+}
+
+.siriso-pm-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  padding: 0.3rem;
+  border-radius: 0.8rem;
+  background: var(--p-zinc-900);
+  border: 1px solid color-mix(in srgb, var(--p-white) 9%, transparent);
+  margin-bottom: 1.15rem;
+}
+
+.siriso-pm-tab {
+  padding: 0.58rem 0.85rem;
+  border-radius: 0.6rem;
+  border: none;
+  background: transparent;
+  color: var(--p-zinc-400);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.siriso-pm-tab--active {
+  background: linear-gradient(135deg, var(--p-siriso-orange-500) 0%, var(--p-siriso-orange-600) 100%);
+  color: var(--p-white);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--p-siriso-orange-500) 32%, transparent);
+}
+
+.siriso-pm-heading {
+  font-family: "Syne", "Plus Jakarta Sans", sans-serif;
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--p-white);
+  margin: 0 0 0.25rem;
+}
+
+.siriso-pm-subheading {
+  font-size: 0.82rem;
+  color: var(--p-zinc-400);
+  margin: 0 0 1.1rem;
+  line-height: 1.5;
+}
+
+.siriso-pm-alert {
+  padding: 0.75rem 0.95rem;
+  border-radius: 0.75rem;
+  font-size: 0.81rem;
+  line-height: 1.45;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.siriso-pm-alert--error {
+  background: color-mix(in srgb, var(--p-red-500) 14%, var(--p-zinc-900));
+  border: 1px solid color-mix(in srgb, var(--p-red-500) 42%, transparent);
+  color: var(--p-red-200);
+}
+
+.siriso-pm-alert--success {
+  background: color-mix(in srgb, var(--p-green-500) 14%, var(--p-zinc-900));
+  border: 1px solid color-mix(in srgb, var(--p-green-500) 42%, transparent);
+  color: var(--p-green-200);
+}
+
+.siriso-pm-alert--info {
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 14%, var(--p-zinc-900));
+  border: 1px solid color-mix(in srgb, var(--p-siriso-orange-500) 45%, transparent);
+  color: var(--p-siriso-orange-200);
+}
+
+.siriso-pm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.siriso-pm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+
+.siriso-pm-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--p-zinc-300);
+}
+
+.siriso-pm-input {
+  width: 100%;
+  padding: 0.68rem 0.9rem;
+  border-radius: 0.68rem;
+  background: var(--p-zinc-900);
+  border: 1px solid color-mix(in srgb, var(--p-white) 12%, transparent);
+  color: var(--p-white);
+  font-size: 0.88rem;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.siriso-pm-input::placeholder {
+  color: var(--p-zinc-500);
+}
+
+.siriso-pm-input:focus {
+  outline: none;
+  border-color: var(--p-siriso-orange-500);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-siriso-orange-500) 22%, transparent);
+}
+
+.siriso-pm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.74rem 1.15rem;
+  border-radius: 0.75rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+}
+
+.siriso-pm-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.siriso-pm-btn-primary {
+  background: linear-gradient(135deg, var(--p-siriso-orange-500) 0%, var(--p-siriso-orange-600) 100%);
+  color: var(--p-white);
+  border-color: color-mix(in srgb, var(--p-siriso-orange-300) 40%, transparent);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--p-siriso-orange-500) 32%, transparent);
+}
+
+.siriso-pm-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--p-siriso-orange-500) 44%, transparent);
+}
+
+.siriso-pm-btn-secondary {
+  background: color-mix(in srgb, var(--p-white) 5%, var(--p-zinc-900));
+  color: var(--p-zinc-200);
+  border-color: color-mix(in srgb, var(--p-white) 14%, transparent);
+}
+
+.siriso-pm-btn-secondary:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--p-siriso-orange-500) 45%, transparent);
+  color: var(--p-white);
+}
+
+.siriso-pm-btn-sm {
+  width: auto;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.78rem;
+  border-radius: 0.55rem;
+}
+
+.siriso-pm-user-card {
+  padding: 1rem 1.1rem;
+  border-radius: 0.95rem;
+  background: var(--p-zinc-900);
+  border: 1px solid color-mix(in srgb, var(--p-white) 10%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.siriso-pm-user-card--pro {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--p-siriso-orange-500) 14%, var(--p-zinc-900)) 0%,
+    var(--p-zinc-900) 100%
+  );
+  border-color: color-mix(in srgb, var(--p-siriso-orange-500) 45%, transparent);
+}
+
+.siriso-pm-user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.siriso-pm-avatar {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: "Syne", sans-serif;
+  font-weight: 800;
+  font-size: 0.95rem;
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 20%, var(--p-zinc-800));
+  color: var(--p-siriso-orange-400);
+  border: 1px solid color-mix(in srgb, var(--p-siriso-orange-500) 45%, transparent);
+  flex-shrink: 0;
+}
+
+.siriso-pm-user-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--p-white);
+  margin: 0;
+}
+
+.siriso-pm-user-email {
+  font-size: 0.76rem;
+  color: var(--p-zinc-400);
+  margin: 0.1rem 0 0;
+}
+
+.siriso-pm-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.24rem 0.65rem;
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.siriso-pm-status-badge--pro {
+  background: color-mix(in srgb, var(--p-green-500) 18%, var(--p-zinc-900));
+  color: var(--p-green-400);
+  border: 1px solid color-mix(in srgb, var(--p-green-500) 45%, transparent);
+}
+
+.siriso-pm-status-badge--pending {
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 18%, var(--p-zinc-900));
+  color: var(--p-siriso-orange-400);
+  border: 1px solid color-mix(in srgb, var(--p-siriso-orange-500) 45%, transparent);
+}
+
+.siriso-pm-status-badge--free {
+  background: color-mix(in srgb, var(--p-white) 7%, var(--p-zinc-900));
+  color: var(--p-zinc-300);
+  border: 1px solid color-mix(in srgb, var(--p-white) 14%, transparent);
+}
+
+.siriso-pm-panel {
+  padding: 1.15rem;
+  border-radius: 0.95rem;
+  background: color-mix(in srgb, var(--p-white) 3%, var(--p-zinc-900));
+  border: 1px solid color-mix(in srgb, var(--p-white) 10%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.siriso-pm-panel--highlight {
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 8%, var(--p-zinc-900));
+  border-color: color-mix(in srgb, var(--p-siriso-orange-500) 35%, transparent);
+}
+
+.siriso-pm-panel-title {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--p-white);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.siriso-pm-panel-desc {
+  font-size: 0.79rem;
+  line-height: 1.5;
+  color: var(--p-zinc-300);
+  margin: 0;
+}
+
+.siriso-pm-code-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.68rem;
+  background: var(--p-black);
+  border: 1px solid color-mix(in srgb, var(--p-siriso-orange-500) 40%, transparent);
+}
+
+.siriso-pm-code-value {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--p-siriso-orange-400);
+}
+
+.siriso-pm-offline-toggle {
+  padding-top: 0.85rem;
+  border-top: 1px solid color-mix(in srgb, var(--p-white) 8%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.siriso-pm-offline-link {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--p-zinc-400);
+  font-size: 0.76rem;
+  text-align: left;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color 0.18s ease;
+}
+
+.siriso-pm-offline-link:hover {
+  color: var(--p-siriso-orange-400);
+}
+
+.siriso-pm-qris-card {
+  padding: 1.05rem;
+  border-radius: 0.95rem;
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--p-siriso-orange-500) 10%, var(--p-zinc-900)) 0%,
+    var(--p-zinc-900) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--p-siriso-orange-500) 42%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.siriso-pm-qris-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--p-white) 10%, transparent);
+}
+
+.siriso-pm-qris-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 0.45rem;
+  background: var(--p-siriso-orange-500);
+  color: var(--p-white);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.siriso-pm-qris-order-id {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  color: var(--p-zinc-300);
+}
+
+.siriso-pm-qris-body {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.siriso-pm-qris-frame {
+  background: var(--p-white);
+  color: var(--p-black);
+  padding: 0.65rem;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--p-black) 50%, transparent);
+}
+
+.siriso-pm-qris-merchant {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--p-black);
+  text-transform: uppercase;
+}
+
+.siriso-pm-qris-nmid {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.6rem;
+  color: var(--p-gray-600);
+}
+
+.siriso-pm-qris-img {
+  width: 164px;
+  height: 164px;
+  object-fit: contain;
+  display: block;
+}
+
+.siriso-pm-qris-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.siriso-pm-qris-amount-box {
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.65rem;
+  background: var(--p-black);
+  border: 1px solid color-mix(in srgb, var(--p-siriso-orange-500) 38%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.siriso-pm-qris-amount-value {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: var(--p-siriso-orange-400);
+}
+
+.siriso-pm-qris-note {
+  font-size: 0.73rem;
+  line-height: 1.45;
+  color: var(--p-zinc-300);
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .siriso-pm-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .siriso-pm-qris-body {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .siriso-pm-aside {
+    border-right: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--p-white) 9%, transparent);
+    padding: 1.5rem 1.35rem;
+  }
+
+  .siriso-pm-main {
+    padding: 1.5rem 1.35rem;
+  }
+}
+

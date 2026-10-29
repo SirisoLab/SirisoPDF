@@ -1,0 +1,1197 @@
+@font-face {
+  font-family: "SirisoSyne";
+  src: url("../../../assets/brand/fonts/Syne-Variable.ttf") format("truetype");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+.siriso-lp {
+  --lp-bg: var(--p-black);
+  --lp-bg-elevated: var(--p-zinc-950);
+  --lp-card: var(--p-zinc-900);
+  --lp-card-raised: var(--p-zinc-850);
+  --lp-card-hover: var(--p-zinc-800);
+  --lp-border: color-mix(in srgb, var(--p-white) 9%, transparent);
+  --lp-border-strong: color-mix(in srgb, var(--p-white) 16%, transparent);
+  --lp-border-orange: color-mix(in srgb, var(--p-siriso-orange-500) 42%, transparent);
+  --lp-orange: var(--p-siriso-orange-500);
+  --lp-orange-bright: var(--p-siriso-orange-400);
+  --lp-orange-deep: var(--p-siriso-orange-600);
+  --lp-orange-soft: color-mix(in srgb, var(--p-siriso-orange-500) 14%, transparent);
+  --lp-orange-glow: color-mix(in srgb, var(--p-siriso-orange-500) 28%, transparent);
+  --lp-text: var(--p-snow);
+  --lp-text-secondary: var(--p-zinc-200);
+  --lp-text-muted: var(--p-zinc-250);
+  --lp-font-display: "SirisoSyne", "Syne", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --lp-font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --lp-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  background-color: var(--lp-bg);
+  color: var(--lp-text);
+  font-family: var(--lp-font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.siriso-lp::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 16% 12%, color-mix(in srgb, var(--p-siriso-orange-500) 15%, transparent), transparent 42%),
+    radial-gradient(circle at 84% 22%, color-mix(in srgb, var(--p-siriso-orange-600) 12%, transparent), transparent 46%),
+    linear-gradient(180deg, var(--p-black) 0%, var(--p-zinc-950) 50%, var(--p-black) 100%);
+}
+
+.siriso-lp-grid-backdrop {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--p-white) 3%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--p-white) 3%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 85% 70% at 50% 25%, black 35%, transparent 100%);
+}
+
+.siriso-lp-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 3.25rem);
+}
+
+.siriso-lp-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 0.9rem clamp(1rem, 3vw, 2.5rem);
+  backdrop-filter: blur(18px) saturate(160%);
+  background: color-mix(in srgb, var(--p-zinc-950) 84%, transparent);
+  border-bottom: 1px solid var(--lp-border);
+}
+
+.siriso-lp-nav {
+  max-width: 1340px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.siriso-lp-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--lp-text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.siriso-lp-brand-logo-wrap {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 12%, var(--p-zinc-900));
+  border: 1px solid var(--lp-border-orange);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--p-siriso-orange-500) 24%, transparent);
+  transition: transform 0.35s ease;
+}
+
+.siriso-lp-brand:hover .siriso-lp-brand-logo-wrap {
+  transform: rotate(90deg) scale(1.04);
+}
+
+.siriso-lp-brand-logo {
+  width: 1.55rem;
+  height: 1.55rem;
+  object-fit: contain;
+}
+
+.siriso-lp-brand-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.siriso-lp-brand-name {
+  font-family: var(--lp-font-display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--lp-text);
+  white-space: nowrap;
+}
+
+.siriso-lp-brand-badge {
+  font-family: var(--lp-font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  background: var(--lp-orange-soft);
+  color: var(--lp-orange-bright);
+  border: 1px solid var(--lp-border-orange);
+  white-space: nowrap;
+}
+
+.siriso-lp-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.28rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--p-white) 4%, var(--p-zinc-900));
+  border: 1px solid var(--lp-border);
+}
+
+.siriso-lp-nav-link {
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--lp-text-secondary);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.siriso-lp-nav-link:hover,
+.siriso-lp-nav-link:focus-visible {
+  color: var(--lp-text);
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 16%, transparent);
+  outline: none;
+}
+
+.siriso-lp-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+.siriso-lp-lab-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--lp-font-mono);
+  font-size: 0.74rem;
+  color: var(--lp-text-muted);
+  text-decoration: none;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--lp-border);
+  white-space: nowrap;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.siriso-lp-lab-link:hover {
+  color: var(--lp-orange-bright);
+  border-color: var(--lp-border-orange);
+}
+
+.siriso-lp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  font-family: var(--lp-font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.6rem 1.15rem;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.siriso-lp-btn:focus-visible {
+  outline: 2px solid var(--lp-orange-bright);
+  outline-offset: 2px;
+}
+
+.siriso-lp-btn-primary {
+  background: linear-gradient(135deg, var(--p-siriso-orange-500) 0%, var(--p-siriso-orange-600) 100%);
+  color: var(--p-white);
+  border: 1px solid color-mix(in srgb, var(--p-siriso-orange-300) 45%, transparent);
+  box-shadow: 0 6px 24px var(--lp-orange-glow);
+}
+
+.siriso-lp-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--p-siriso-orange-500) 45%, transparent);
+}
+
+.siriso-lp-btn-secondary {
+  background: color-mix(in srgb, var(--p-white) 5%, var(--p-zinc-900));
+  color: var(--lp-text);
+  border: 1px solid var(--lp-border-strong);
+}
+
+.siriso-lp-btn-secondary:hover {
+  border-color: var(--lp-border-orange);
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 12%, var(--p-zinc-900));
+}
+
+.siriso-lp-btn-outline-orange {
+  background: var(--lp-orange-soft);
+  color: var(--lp-orange-bright);
+  border: 1px solid var(--lp-border-orange);
+}
+
+.siriso-lp-btn-outline-orange:hover {
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 24%, transparent);
+  color: var(--p-white);
+}
+
+.siriso-lp-btn-lg {
+  font-size: 0.98rem;
+  padding: 0.85rem 1.55rem;
+}
+
+.siriso-lp-hero {
+  position: relative;
+  z-index: 2;
+  padding: clamp(1.75rem, 3.5vw, 3.25rem) 0 clamp(2.5rem, 4.5vw, 4rem);
+}
+
+.siriso-lp-hero-grid {
+  display: grid;
+  grid-template-columns: 1.12fr 0.88fr;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: center;
+}
+
+.siriso-lp-telemetry-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.36rem 0.9rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 10%, var(--p-zinc-900));
+  border: 1px solid var(--lp-border-orange);
+  font-family: var(--lp-font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--lp-orange-bright);
+  margin-bottom: 1.15rem;
+}
+
+.siriso-lp-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--p-siriso-orange-500);
+  box-shadow: 0 0 10px var(--p-siriso-orange-500);
+  flex-shrink: 0;
+}
+
+.siriso-lp-hero-title {
+  font-family: var(--lp-font-display);
+  font-weight: 800;
+  font-size: clamp(2rem, 3.2vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--lp-text);
+  margin: 0 0 1.15rem;
+  overflow-wrap: break-word;
+}
+
+.siriso-lp-hero-title-accent {
+  color: var(--lp-orange-bright);
+  display: inline-block;
+}
+
+.siriso-lp-hero-desc {
+  font-size: clamp(1rem, 1.15vw, 1.14rem);
+  color: var(--lp-text-secondary);
+  max-width: 620px;
+  margin: 0 0 1.85rem;
+}
+
+.siriso-lp-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 2.2rem;
+}
+
+.siriso-lp-trust-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--lp-border);
+}
+
+.siriso-lp-trust-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.siriso-lp-trust-value {
+  font-family: var(--lp-font-display);
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: var(--lp-orange-bright);
+  line-height: 1.15;
+}
+
+.siriso-lp-trust-label {
+  font-size: 0.82rem;
+  color: var(--lp-text-muted);
+}
+
+.siriso-lp-launchpad {
+  position: relative;
+  border-radius: 1.35rem;
+  padding: 1.5rem;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--p-siriso-orange-500) 9%, var(--p-zinc-900)) 0%,
+    var(--p-zinc-950) 100%
+  );
+  border: 1px solid var(--lp-border-orange);
+  box-shadow:
+    0 24px 60px color-mix(in srgb, var(--p-black) 75%, transparent),
+    0 0 40px color-mix(in srgb, var(--p-siriso-orange-500) 12%, transparent);
+}
+
+.siriso-lp-launchpad-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--lp-border);
+}
+
+.siriso-lp-window-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.siriso-lp-window-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--p-zinc-600);
+}
+
+.siriso-lp-window-dot--orange {
+  background: var(--p-siriso-orange-500);
+}
+
+.siriso-lp-launchpad-tag {
+  font-family: var(--lp-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lp-text-muted);
+}
+
+.siriso-lp-dropzone {
+  position: relative;
+  border-radius: 1rem;
+  padding: 1.75rem 1.25rem;
+  text-align: center;
+  background: color-mix(in srgb, var(--p-black) 60%, var(--p-zinc-900));
+  border: 1.5px dashed var(--lp-border-orange);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  margin-bottom: 1.15rem;
+}
+
+.siriso-lp-dropzone:hover,
+.siriso-lp-dropzone--active {
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 12%, var(--p-zinc-900));
+  border-color: var(--p-siriso-orange-400);
+  transform: translateY(-2px);
+}
+
+.siriso-lp-dropzone-icon {
+  width: 3.2rem;
+  height: 3.2rem;
+  margin: 0 auto 0.75rem;
+  border-radius: 0.9rem;
+  display: grid;
+  place-items: center;
+  background: var(--lp-orange-soft);
+  color: var(--lp-orange-bright);
+  border: 1px solid var(--lp-border-orange);
+}
+
+.siriso-lp-dropzone-title {
+  font-family: var(--lp-font-display);
+  font-weight: 700;
+  font-size: 1.08rem;
+  color: var(--lp-text);
+  margin-bottom: 0.3rem;
+}
+
+.siriso-lp-dropzone-sub {
+  font-size: 0.83rem;
+  color: var(--lp-text-muted);
+  margin-bottom: 0.9rem;
+}
+
+.siriso-lp-quick-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--lp-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lp-text-muted);
+  margin-bottom: 0.65rem;
+}
+
+.siriso-lp-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.siriso-lp-quick-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.62rem 0.75rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--p-white) 3%, var(--p-zinc-900));
+  border: 1px solid var(--lp-border);
+  color: var(--lp-text);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+}
+
+.siriso-lp-quick-btn:hover {
+  border-color: var(--lp-border-orange);
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 12%, var(--p-zinc-900));
+  transform: translateY(-1px);
+}
+
+.siriso-lp-quick-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.55rem;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: var(--lp-orange-soft);
+  color: var(--lp-orange-bright);
+}
+
+.siriso-lp-quick-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.siriso-lp-quick-label {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--lp-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.siriso-lp-quick-sub {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--lp-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.siriso-lp-marquee {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(90deg, var(--p-siriso-orange-600), var(--p-siriso-orange-500), var(--p-siriso-orange-600));
+  color: var(--p-black);
+  padding: 0.75rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--p-white) 22%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--p-white) 22%, transparent);
+  overflow: hidden;
+}
+
+.siriso-lp-marquee-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 1rem;
+  font-family: var(--lp-font-display);
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.siriso-lp-marquee-dot {
+  opacity: 0.65;
+}
+
+.siriso-lp-section {
+  position: relative;
+  z-index: 2;
+  scroll-margin-top: 5.25rem;
+  padding: clamp(3.5rem, 6vw, 5.75rem) 0;
+  border-top: 1px solid var(--lp-border);
+}
+
+.siriso-lp-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+
+.siriso-lp-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: var(--lp-font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lp-text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.siriso-lp-section-index {
+  color: var(--lp-orange-bright);
+  font-weight: 700;
+}
+
+.siriso-lp-section-title {
+  font-family: var(--lp-font-display);
+  font-weight: 800;
+  font-size: clamp(1.85rem, 3.2vw, 2.85rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--lp-text);
+  margin: 0;
+}
+
+.siriso-lp-section-subtitle {
+  max-width: 540px;
+  font-size: 0.98rem;
+  color: var(--lp-text-secondary);
+  margin: 0;
+}
+
+.siriso-lp-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.siriso-lp-filter-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.52rem 1rem;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  background: var(--lp-card);
+  color: var(--lp-text-secondary);
+  border: 1px solid var(--lp-border);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.siriso-lp-filter-tab:hover {
+  color: var(--lp-text);
+  border-color: var(--lp-border-orange);
+}
+
+.siriso-lp-filter-tab--active {
+  background: linear-gradient(135deg, var(--p-siriso-orange-500), var(--p-siriso-orange-600));
+  color: var(--p-white);
+  border-color: var(--p-siriso-orange-400);
+}
+
+.siriso-lp-filter-count {
+  font-family: var(--lp-font-mono);
+  font-size: 0.72rem;
+  padding: 0.08rem 0.42rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--p-black) 35%, transparent);
+}
+
+.siriso-lp-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.siriso-lp-feature-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-radius: 1.15rem;
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--p-white) 4%, var(--p-zinc-900)) 0%,
+    var(--p-zinc-950) 100%
+  );
+  border: 1px solid var(--lp-border);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.siriso-lp-feature-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--lp-border-orange);
+  box-shadow: 0 18px 40px color-mix(in srgb, var(--p-black) 65%, transparent);
+}
+
+.siriso-lp-feature-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+}
+
+.siriso-lp-feature-icon-box {
+  width: 2.85rem;
+  height: 2.85rem;
+  border-radius: 0.8rem;
+  display: grid;
+  place-items: center;
+  background: var(--lp-orange-soft);
+  color: var(--lp-orange-bright);
+  border: 1px solid var(--lp-border-orange);
+}
+
+.siriso-lp-feature-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.siriso-lp-feature-code {
+  font-family: var(--lp-font-mono);
+  font-size: 0.7rem;
+  color: var(--lp-text-muted);
+  letter-spacing: 0.06em;
+}
+
+.siriso-lp-feature-badge {
+  font-family: var(--lp-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 0.16rem 0.5rem;
+  border-radius: 999px;
+  background: var(--lp-orange-soft);
+  color: var(--lp-orange-bright);
+  border: 1px solid var(--lp-border-orange);
+}
+
+.siriso-lp-feature-category {
+  font-family: var(--lp-font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--lp-orange-bright);
+  margin-bottom: 0.3rem;
+}
+
+.siriso-lp-feature-title {
+  font-family: var(--lp-font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  line-height: 1.25;
+  color: var(--lp-text);
+  margin: 0 0 0.25rem;
+}
+
+.siriso-lp-feature-sub {
+  font-size: 0.8rem;
+  color: var(--lp-text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.siriso-lp-feature-desc {
+  font-size: 0.9rem;
+  color: var(--lp-text-secondary);
+  margin: 0 0 1.1rem;
+}
+
+.siriso-lp-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.siriso-lp-feature-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--lp-text-secondary);
+}
+
+.siriso-lp-feature-cta {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.95rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--p-siriso-orange-500) 10%, var(--p-zinc-900));
+  border: 1px solid var(--lp-border-orange);
+  color: var(--lp-orange-bright);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.siriso-lp-feature-cta:hover {
+  background: var(--p-siriso-orange-600);
+  color: var(--p-white);
+}
+
+.siriso-lp-arch-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.15rem;
+}
+
+.siriso-lp-arch-pod {
+  padding: 1.45rem;
+  border-radius: 1.1rem;
+  background: var(--lp-card);
+  border: 1px solid var(--lp-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.siriso-lp-arch-pod:hover {
+  border-color: var(--lp-border-orange);
+  transform: translateY(-3px);
+}
+
+.siriso-lp-arch-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.siriso-lp-arch-idx {
+  font-family: var(--lp-font-mono);
+  font-size: 0.72rem;
+  color: var(--lp-text-muted);
+}
+
+.siriso-lp-arch-metric {
+  font-family: var(--lp-font-display);
+  font-weight: 800;
+  font-size: 1.85rem;
+  color: var(--lp-orange-bright);
+  line-height: 1.1;
+  margin-bottom: 0.45rem;
+}
+
+.siriso-lp-arch-title {
+  font-family: var(--lp-font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--lp-text);
+  margin: 0 0 0.55rem;
+}
+
+.siriso-lp-arch-desc {
+  font-size: 0.86rem;
+  color: var(--lp-text-secondary);
+  margin: 0 0 1.1rem;
+}
+
+.siriso-lp-arch-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.siriso-lp-spec-chip {
+  font-family: var(--lp-font-mono);
+  font-size: 0.68rem;
+  padding: 0.2rem 0.52rem;
+  border-radius: 0.4rem;
+  background: color-mix(in srgb, var(--p-white) 5%, var(--p-zinc-950));
+  border: 1px solid var(--lp-border);
+  color: var(--lp-text-muted);
+}
+
+.siriso-lp-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.siriso-lp-step-card {
+  position: relative;
+  padding: 1.65rem;
+  border-radius: 1.15rem;
+  background: var(--lp-card);
+  border: 1px solid var(--lp-border);
+}
+
+.siriso-lp-step-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.siriso-lp-step-num {
+  font-family: var(--lp-font-display);
+  font-weight: 800;
+  font-size: 2.2rem;
+  color: var(--lp-orange-bright);
+  line-height: 1;
+}
+
+.siriso-lp-step-phase {
+  font-family: var(--lp-font-mono);
+  font-size: 0.72rem;
+  color: var(--lp-text-muted);
+  letter-spacing: 0.06em;
+}
+
+.siriso-lp-step-title {
+  font-family: var(--lp-font-display);
+  font-weight: 700;
+  font-size: 1.18rem;
+  color: var(--lp-text);
+  margin: 0 0 0.55rem;
+}
+
+.siriso-lp-step-desc {
+  font-size: 0.9rem;
+  color: var(--lp-text-secondary);
+  margin: 0 0 1.1rem;
+}
+
+.siriso-lp-step-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--lp-font-mono);
+  font-size: 0.74rem;
+  color: var(--lp-orange-bright);
+}
+
+.siriso-lp-pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.siriso-lp-plan-card {
+  padding: 2rem;
+  border-radius: 1.25rem;
+  background: var(--lp-card);
+  border: 1px solid var(--lp-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.siriso-lp-plan-card--pro {
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--p-siriso-orange-500) 14%, var(--p-zinc-900)) 0%,
+    var(--p-zinc-950) 100%
+  );
+  border: 1.5px solid var(--lp-border-orange);
+  box-shadow: 0 20px 50px color-mix(in srgb, var(--p-siriso-orange-500) 14%, transparent);
+}
+
+.siriso-lp-plan-price {
+  font-family: var(--lp-font-display);
+  font-weight: 800;
+  font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+  color: var(--lp-text);
+  margin: 0.5rem 0 0.35rem;
+}
+
+.siriso-lp-plan-period {
+  font-family: var(--lp-font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--lp-text-muted);
+}
+
+.siriso-lp-plan-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.siriso-lp-plan-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--lp-text-secondary);
+}
+
+.siriso-lp-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.siriso-lp-faq-item {
+  border-radius: 0.95rem;
+  background: var(--lp-card);
+  border: 1px solid var(--lp-border);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.siriso-lp-faq-item[open] {
+  border-color: var(--lp-border-orange);
+}
+
+.siriso-lp-faq-summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 1.35rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: var(--lp-text);
+}
+
+.siriso-lp-faq-summary::-webkit-details-marker {
+  display: none;
+}
+
+.siriso-lp-faq-left {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.siriso-lp-faq-num {
+  font-family: var(--lp-font-mono);
+  font-size: 0.78rem;
+  color: var(--lp-orange-bright);
+}
+
+.siriso-lp-faq-answer {
+  padding: 0 1.35rem 1.25rem 3.1rem;
+  font-size: 0.92rem;
+  color: var(--lp-text-secondary);
+}
+
+.siriso-lp-cta-banner {
+  margin: 1rem 0 0;
+  padding: clamp(2rem, 4vw, 3.25rem);
+  border-radius: 1.5rem;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--p-siriso-orange-500) 20%, var(--p-zinc-900)) 0%,
+    var(--p-zinc-950) 100%
+  );
+  border: 1px solid var(--lp-border-orange);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.siriso-lp-footer {
+  position: relative;
+  z-index: 2;
+  padding: 3.5rem 0 2.5rem;
+  border-top: 1px solid var(--lp-border);
+  background: var(--p-zinc-950);
+}
+
+.siriso-lp-footer-top {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr 1fr;
+  gap: 2rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--lp-border);
+}
+
+.siriso-lp-footer-col-title {
+  font-family: var(--lp-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lp-orange-bright);
+  margin: 0 0 0.85rem;
+}
+
+.siriso-lp-footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.siriso-lp-footer-link {
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
+  font-size: 0.88rem;
+  color: var(--lp-text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.siriso-lp-footer-link:hover {
+  color: var(--lp-orange-bright);
+}
+
+.siriso-lp-footer-bottom {
+  padding-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+  color: var(--lp-text-muted);
+}
+
+@media (max-width: 1120px) {
+  .siriso-lp-hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .siriso-lp-features-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .siriso-lp-arch-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .siriso-lp-pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .siriso-lp-footer-top {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .siriso-lp-header {
+    padding: 0.7rem 0.9rem;
+  }
+
+  .siriso-lp-nav-links,
+  .siriso-lp-lab-link,
+  .siriso-lp-brand-badge,
+  .siriso-lp-nav-actions .siriso-lp-btn-outline-orange {
+    display: none;
+  }
+
+  .siriso-lp-brand-name {
+    font-size: 1rem;
+  }
+
+  .siriso-lp-nav-actions .siriso-lp-btn-primary {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.9rem;
+  }
+
+  .siriso-lp-hero-title {
+    font-size: clamp(1.65rem, 6.2vw, 2.2rem);
+  }
+
+  .siriso-lp-section-title {
+    font-size: clamp(1.45rem, 5.5vw, 1.95rem);
+  }
+
+  .siriso-lp-features-grid,
+  .siriso-lp-arch-grid,
+  .siriso-lp-steps-grid,
+  .siriso-lp-quick-grid,
+  .siriso-lp-footer-top {
+    grid-template-columns: 1fr;
+  }
+
+  .siriso-lp-trust-strip {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .siriso-lp-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .siriso-lp-hero-actions .siriso-lp-btn {
+    width: 100%;
+  }
+}
+

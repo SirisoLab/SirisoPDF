@@ -1,0 +1,19 @@
+version: '3'
+
+tasks:
+  check:
+    desc: "Check the CEF desktop launcher"
+    cmds:
+      - cmd: cmd /c ".\gradlew.bat -p desktop/cef checkLauncher"
+        platforms: [windows]
+      - cmd: ./gradlew -p desktop/cef checkLauncher
+        platforms: [linux, darwin]
+  package:
+    desc: "Package the CEF desktop application"
+    env:
+      STIRLING_CEF_BACKEND_JAR: '{{.BACKEND_JAR | default "../../dist/native/stirling-pdf.jar"}}'
+    cmds:
+      - cmd: cmd /c ".\gradlew.bat -p desktop/cef packageDesktop"
+        platforms: [windows]
+      - cmd: ./gradlew -p desktop/cef packageDesktop
+        platforms: [linux, darwin]
