@@ -55,8 +55,6 @@ export function usePolicies() {
       try {
         byCategory = await fetchPoliciesByCategory();
       } catch {
-        if (cancelled || attempt >= RECONCILE_MAX_ATTEMPTS) return;
-        timer = setTimeout(reconcile, reconcileRetryDelay(attempt++));
         return;
       }
       if (cancelled) return;

@@ -24,10 +24,14 @@ interface JobResponse {
 
 /** List all stored policies. */
 export async function listPolicies(): Promise<BackendPolicy[]> {
-  const res = await apiClient.get<BackendPolicy[]>("/api/v1/policies", {
-    suppressErrorToast: true,
-  });
-  return res.data;
+  try {
+    const res = await apiClient.get<BackendPolicy[]>("/api/v1/policies", {
+      suppressErrorToast: true,
+    });
+    return res.data;
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -101,8 +105,12 @@ export async function getPolicyRun(runId: string): Promise<PolicyRunView> {
  * finished run is never orphaned on the backend.
  */
 export async function listPolicyRuns(): Promise<PolicyRunView[]> {
-  const res = await apiClient.get<PolicyRunView[]>("/api/v1/policies/runs", {
-    suppressErrorToast: true,
-  });
-  return res.data;
+  try {
+    const res = await apiClient.get<PolicyRunView[]>("/api/v1/policies/runs", {
+      suppressErrorToast: true,
+    });
+    return res.data;
+  } catch {
+    return [];
+  }
 }

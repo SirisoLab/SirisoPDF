@@ -778,6 +778,24 @@ async function handleAppV1Api(req, res, urlObj) {
     });
   }
 
+  if (
+    pathname === "/api/v1/policies" ||
+    pathname.startsWith("/api/v1/policies/")
+  ) {
+    return sendJson(res, 200, []);
+  }
+
+  if (
+    pathname === "/api/v1/notifications" ||
+    pathname.startsWith("/api/v1/notifications")
+  ) {
+    return sendJson(res, 200, {
+      notifications: [],
+      viewerReviewsTeam: false,
+      viewerKey: null,
+    });
+  }
+
   return sendJson(res, 503, {
     error: "Operasi server Java tidak aktif pada mode ringan Termux.",
   });
