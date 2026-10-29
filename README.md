@@ -1,74 +1,103 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Stirling-Tools/Stirling-PDF/main/docs/stirling.png" width="80" alt="Stirling PDF logo">
+  <img src="frontend/src/editor/core/assets/brand/modern-logo/SirisoLogo.png" width="88" alt="Siriso PDF Logo">
 </p>
 
-<h1 align="center">Stirling PDF - The Open-Source PDF Platform</h1>
-
-Stirling PDF is a powerful, open-source PDF editing platform. Run it as a personal desktop app, in the browser, or deploy it on your own servers with a private API. Edit, sign, redact, convert, and automate PDFs without sending documents to external services.
+<h1 align="center">Siriso PDF — Studio Dokumen PDF Profesional oleh Siriso Lab</h1>
 
 <p align="center">
-  <a href="https://hub.docker.com/r/stirlingtools/stirling-pdf">
-    <img src="https://img.shields.io/docker/pulls/frooodle/s-pdf" alt="Docker Pulls">
+  Platform pengolahan, konversi, tanda tangan sertifikat digital, OCR, dan otomatisasi dokumen PDF berkecepatan tinggi dengan identitas visual <strong>Carbon Obsidian &amp; Siriso Orange</strong>. Tersedia sebagai <strong>Aplikasi Web</strong> maupun <strong>Aplikasi Desktop Windows (x64 Offline)</strong>.
+</p>
+
+<p align="center">
+  <a href="https://sirisolab.com">
+    <img src="https://img.shields.io/badge/Produk_Resmi-Siriso_Lab-f97316?style=for-the-badge" alt="Siriso Lab">
   </a>
-  <a href="https://discord.gg/HYmhKj45pU">
-    <img src="https://img.shields.io/discord/1068636748814483718?label=Discord" alt="Discord">
+  <a href="https://github.com/hanzputram/SirisoPDF">
+    <img src="https://img.shields.io/badge/Repository-SirisoPDF-18181b?style=for-the-badge&logo=github" alt="GitHub Repository">
   </a>
-  <a href="https://scorecard.dev/viewer/?uri=github.com/Stirling-Tools/Stirling-PDF">
-    <img src="https://api.scorecard.dev/projects/github.com/Stirling-Tools/Stirling-PDF/badge" alt="OpenSSF Scorecard">
+  <a href="https://sirisolab.com">
+    <img src="https://img.shields.io/badge/Platform-Web_%26_Windows_x64-f97316?style=for-the-badge" alt="Platform Web & Windows">
   </a>
-  <a href="https://github.com/Stirling-Tools/stirling-pdf">
-    <img src="https://img.shields.io/github/stars/stirling-tools/stirling-pdf?style=social" alt="GitHub Repo stars">
+  <a href="https://sirisolab.com">
+    <img src="https://img.shields.io/badge/Payment_Gateway-QRIS_Resmi-22c55e?style=for-the-badge" alt="QRIS Payment Gateway">
   </a>
 </p>
 
-![Stirling PDF - Dashboard](docs/images/home-light.png)
+---
 
-## Key Capabilities
+## Tampilan Antarmuka Siriso PDF
 
-- **Everywhere you work** - Desktop client, browser UI, and self-hosted server with a private API.
-- **50+ PDF tools** - Edit, merge, split, sign, redact, convert, OCR, compress, and more.
-- **Automation & workflows** - No-code pipelines direct in UI with APIs to process millions of PDFs.
-- **Enterprise‑grade** - SSO, auditing, and flexible on‑prem deployments.
-- **Developer platform** - REST APIs available for nearly all tools to integrate into your existing systems.
-- **Global UI** - Interface available in 40+ languages.
+### 1. Landing Page & Katalog Fitur Interaktif
+![Siriso PDF Landing Page](docs/images/siriso-landing.png)
 
-For a full feature list, see the docs: **https://docs.stirlingpdf.com**
+### 2. Workspace Studio PDF (Bebas Iklan Non-Resmi & Terproteksi Akun)
+![Siriso PDF Workspace](docs/images/siriso-workspace.png)
 
-## Quick Start
+### 3. Checkout Paket Pro & Payment Gateway QRIS Terintegrasi
+![Siriso PDF QRIS Payment Gateway](docs/images/siriso-qris-gateway.png)
 
+---
+
+## Fitur Utama Siriso PDF
+
+- **50+ Alat Manipulasi PDF Presisi Tinggi** — Gabungkan (*Merge*), pisahkan (*Split*), urutkan halaman secara visual, kompres ukuran file ekstrem, rotasi, dan sunting teks langsung di atas kanvas PDF.
+- **Siriso Office Convert & Multi-Format** — Konversi dua arah berkecepatan tinggi antara PDF dengan dokumen **Microsoft Word (`.docx`)**, **Excel (`.xlsx`)**, **PowerPoint (`.pptx`)**, gambar resolusi tinggi (`PNG`/`JPG`/`WEBP`), HTML, dan Markdown.
+- **OCR Multi-Bahasa & Pembersihan Hasil Scan** — Ekstraksi teks otomatis dari dokumen hasil pindaian (*scan*) agar dapat dicari (*searchable*) dan disalin dengan akurasi tinggi.
+- **Keamanan Dokumen, Redaksi Permanen & Sertifikat Digital** — Enkripsi kata sandi AES-256, tanda tangan elektronik & sertifikat digital (`PKCS#12` / `X.509`), sanitasi metadata tersembunyi, serta redaksi permanen untuk dokumen rahasia.
+- **Sistem Akun Terpadu & Payment Gateway QRIS (`Rp 25.000 / bulan`)**:
+  - **Akses Workspace Terproteksi Akun**: Pengguna masuk/daftar akun dengan email dan kata sandi untuk mengakses Workspace PDF.
+  - **Checkout QRIS Otomatis (Kode Unik 3 Digit)**: Mendukung pembayaran langsung ke QRIS merchant Anda (BCA, Mandiri, BRI, BNI, GoPay, DANA, OVO, ShopeePay) dengan nominal unik `Rp 25.xxx` dan generator payload **EMVCo Dynamic QRIS (`CRC-16/CCITT-FALSE`)**.
+  - **100% Bebas Iklan di Web & Kode Offline Aplikasi Desktop Windows**: Begitu pembayaran QRIS terverifikasi, akun web langsung bebas iklan secara otomatis (tanpa perlu input kode di web) dan membuka unduhan installer **Siriso PDF Desktop (Windows x64)** beserta **Kode Aktivasi Offline** (`SRP-DESK-XXXX-XXXX`).
+
+---
+
+## Arsitektur Sistem
+
+| Komponen | Direktori / Lokasi | Deskripsi |
+| :--- | :--- | :--- |
+| **Frontend Web & Workspace** | `frontend/` | Aplikasi SPA berbasis React 19 + TypeScript + Vite + Mantine UI dengan tema *Carbon Obsidian & Siriso Orange*. |
+| **Landing Page & Modul Pro/QRIS** | `frontend/src/editor/core/components/shared/siriso/` | Komponen `SirisoLandingPage`, `SirisoProModal` (Auth + Checkout QRIS), dan slot iklan Google AdSense resmi. |
+| **Backend PDF Engine** | `app/` & `dist/native/stirling-pdf.jar` | Layanan Spring Boot + PDFBox + LibreOffice + PDF.js untuk pemrosesan dokumen PDF skala besar. |
+| **Desktop Launcher (Windows)** | `desktop/cef/` & `frontend/src-tauri/` | Paket aplikasi desktop untuk penggunaan lokal/offline di Windows x64. |
+
+---
+
+## Cara Menjalankan di Lokal (Quick Start)
+
+### 1. Menjalankan Server Produksi (`stirling-pdf.jar`)
+```powershell
+java -jar dist\native\stirling-pdf.jar
+```
+Buka di browser: **`http://localhost:8080`**
+
+### 2. Menjalankan Mode Pengembangan Frontend (`Vite`)
+```powershell
+cd frontend
+npm install
+npx vite --mode core --port 5173
+```
+Buka di browser: **`http://localhost:5173`**
+
+### 3. Menggunakan Task Runner (`Taskfile`)
 ```bash
-docker run -p 8080:8080 docker.stirlingpdf.com/stirlingtools/stirling-pdf
+task dev            # Menjalankan backend + frontend secara bersamaan
+task frontend:check # Menjalankan lint, theme-lint, icon-lint, typecheck, dan unit test frontend
+task backend:check  # Menjalankan pemeriksaan kualitas kode backend Java
 ```
 
-Then open: http://localhost:8080
+---
 
-For a Docker-free build, development server and native deployment, see the
-[native web guide](docs/NATIVE_WEB.md). A separate
-[CEF desktop launcher](desktop/cef/README.md) displays the same local core web
-application and manages its backend lifecycle.
+## Manajemen Backoffice & Upload QRIS
 
-For full installation options (including desktop and Kubernetes), see our [Documentation Guide](https://docs.stirlingpdf.com/#documentation-guide).
+Pengaturan harga langganan **Paket Pro**, manajemen akun pelanggan, upload gambar **QRIS Merchant**, konfigurasi **EMVCo Static/Dynamic QRIS**, serta verifikasi transaksi pembayaran QRIS dikelola melalui **Backoffice Siriso Lab** (`http://localhost:8000/admin#/siriso-pdf-qris`).
 
-## Resources
+- **Endpoint Webhook Mutasi QRIS Otomatis**:
+  - `POST /api/siriso-pdf/payment/webhook`
+  - Header: `x-qris-secret: siriso-qris-webhook-2026`
+  - Payload JSON: `{ "amount": 25823 }` atau `{ "orderId": "QRIS-..." }`
 
-- [**Documentation**](https://docs.stirlingpdf.com)
-- [**Homepage**](https://stirling.com)
-- [**API Docs**](https://registry.scalar.com/@stirlingpdf/apis/stirling-pdf-processing-api/)
-- [**Server Plan & Enterprise**](https://docs.stirlingpdf.com/Paid-Offerings)
+---
 
-## Support
+## Lisensi & Hak Cipta
 
-- **Community**: [Discord](https://discord.gg/HYmhKj45pU)
-- **Bug Reports**: [GitHub Issues](https://github.com/Stirling-Tools/Stirling-PDF/issues)
-
-## Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines.
-
-This project uses [Task](https://taskfile.dev/) as a unified command runner for all build, dev, and test commands. Run `task dev` to get started running the editor, run `task` to see the most common commands, or see the [Developer Guide](docs/developer/DeveloperGuide.md) for full details.
-
-For adding translations, see the [Translation Guide](docs/developer/HowToAddNewLanguage.md).
-
-## License
-
-Stirling PDF is open-core. See [LICENSE](LICENSE) for details.
+Dikembangkan dan dikelola oleh **Siriso Lab** ([sirisolab.com](https://sirisolab.com)). Lihat berkas [LICENSE](LICENSE) untuk informasi lisensi selengkapnya.
