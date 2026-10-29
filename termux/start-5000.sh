@@ -62,3 +62,4 @@ if [ "${1:-}" = "--bg" ] || [ "${1:-}" = "--daemon" ]; then
 else
   PORT="$PORT" exec node "$SCRIPT_DIR/server-5000.mjs"
 fi
+
