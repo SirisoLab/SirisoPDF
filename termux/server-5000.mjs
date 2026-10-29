@@ -24,11 +24,17 @@ const DATA_DIR = path.join(__dirname, "data");
 const UPLOADS_DIR = path.join(__dirname, "uploads", "qris");
 
 function resolveDefaultDataFile() {
-  if (process.env.SIRISO_DATA_FILE) {
+  if (process.env.SIRISO_DATA_FILE && fs.existsSync(process.env.SIRISO_DATA_FILE)) {
     return process.env.SIRISO_DATA_FILE;
   }
   const candidates = [
+    path.resolve(REPO_ROOT, "..", "siriso", "data", "siriso-pdf.json"),
     path.resolve(REPO_ROOT, "..", "siriso", "data", "siriso-pdf-ads.json"),
+    path.join(DATA_DIR, "siriso-pdf.json"),
+    path.join(DATA_DIR, "siriso-pdf-ads.json"),
+    process.env.HOME
+      ? path.join(process.env.HOME, "siriso", "data", "siriso-pdf.json")
+      : "",
     process.env.HOME
       ? path.join(process.env.HOME, "siriso", "data", "siriso-pdf-ads.json")
       : "",
@@ -38,7 +44,7 @@ function resolveDefaultDataFile() {
       return c;
     }
   }
-  return path.join(DATA_DIR, "siriso-pdf-ads.json");
+  return path.join(DATA_DIR, "siriso-pdf.json");
 }
 
 const DATA_FILE = resolveDefaultDataFile();
@@ -126,19 +132,49 @@ function readJsonBody(req, maxBytes = 10 * 1024 * 1024) {
   });
 }
 
-function hashPassword(pw) {
-  return crypto
-    .createHash("sha256")
-    .update(String(pw) + "::siriso_pdf_salt_2026")
-    .digest("hex");
+const TOKEN_SECRETS = [
+  "siriso-pdf-customer-secret-2026",
+  "3a850c0f06b6bffdb6d14976051c7774",
+  "siriso_pdf_token_secret_2026",
+];
+
+function hashPassword(pw, salt = crypto.randomBytes(16).toString("hex")) {
+  const hash = crypto.scryptSync(String(pw), salt, 64).toString("hex");
+  return { salt, hash };
+}
+
+function verifyUserPassword(rawPw, rec) {
+  if (!rec) return false;
+  if (typeof rec === "object" && rec.salt && rec.hash) {
+    try {
+      const test = crypto.scryptSync(String(rawPw), rec.salt, 64);
+      const known = Buffer.from(rec.hash, "hex");
+      return known.length === test.length && crypto.timingSafeEqual(known, test);
+    } catch {
+      return false;
+    }
+  }
+  if (typeof rec === "string") {
+    const testHash = crypto
+      .createHash("sha256")
+      .update(String(rawPw) + "::siriso_pdf_salt_2026")
+      .digest("hex");
+    return testHash === rec;
+  }
+  return false;
 }
 
 function createAuthToken(userId, email) {
   const payload = Buffer.from(
-    JSON.stringify({ uid: userId, email, iat: Date.now() }),
+    JSON.stringify({
+      uid: userId,
+      email,
+      iat: Date.now(),
+      exp: Date.now() + 30 * 24 * 60 * 60 * 1000,
+    }),
   ).toString("base64url");
   const sig = crypto
-    .createHmac("sha256", "siriso_pdf_token_secret_2026")
+    .createHmac("sha256", TOKEN_SECRETS[0])
     .update(payload)
     .digest("base64url");
   return `${payload}.${sig}`;
@@ -147,13 +183,22 @@ function createAuthToken(userId, email) {
 function verifyAuthToken(token) {
   if (!token || typeof token !== "string" || !token.includes(".")) return null;
   const [payload, sig] = token.split(".");
-  const expected = crypto
-    .createHmac("sha256", "siriso_pdf_token_secret_2026")
-    .update(payload)
-    .digest("base64url");
-  if (sig !== expected) return null;
+  let valid = false;
+  for (const sec of TOKEN_SECRETS) {
+    const expected = crypto
+      .createHmac("sha256", sec)
+      .update(payload)
+      .digest("base64url");
+    if (sig === expected) {
+      valid = true;
+      break;
+    }
+  }
+  if (!valid) return null;
   try {
-    return JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    const decoded = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    if (decoded.exp && decoded.exp < Date.now()) return null;
+    return decoded;
   } catch {
     return null;
   }
@@ -438,7 +483,7 @@ async function handleSirisoPdfApi(req, res, urlObj) {
     const user = data.users.find(
       (u) => String(u.email).toLowerCase() === email,
     );
-    if (!user || user.passwordHash !== hashPassword(password)) {
+    if (!user || !verifyUserPassword(password, user.passwordHash)) {
       return sendJson(res, 401, {
         ok: false,
         error: "Email atau kata sandi tidak sesuai.",
@@ -631,7 +676,11 @@ async function handleSirisoPdfApi(req, res, urlObj) {
     });
   }
 
-  if (pathname === "/api/siriso-pdf/verify-desktop-code" && method === "POST") {
+  if (
+    (pathname === "/api/siriso-pdf/verify-desktop-code" ||
+      pathname === "/api/siriso-pdf/verify-pro") &&
+    method === "POST"
+  ) {
     const body = await readJsonBody(req);
     const code = String(body.activationCode || body.licenseKey || "")
       .trim()
@@ -641,25 +690,49 @@ async function handleSirisoPdfApi(req, res, urlObj) {
         String(u.desktopActivationCode || "").toUpperCase() === code &&
         u.proStatus === "active",
     );
-    if (!matchedUser) {
+    if (matchedUser) {
       return sendJson(res, 200, {
-        valid: false,
-        error: "Kode aktivasi desktop tidak ditemukan atau belum aktif.",
+        valid: true,
+        subscription: {
+          id: matchedUser.id,
+          customerName: matchedUser.name,
+          customerEmail: matchedUser.email,
+          licenseKey: matchedUser.desktopActivationCode,
+          plan: "Paket Pro (Desktop Offline)",
+          pricePaid: 25000,
+          status: "active",
+          expiresAt: matchedUser.proExpiresAt,
+          downloadsCount: matchedUser.downloadsCount || 0,
+        },
+        user: serializePdfUser(matchedUser),
       });
     }
+
+    const matchedSub = (data.subscriptions || []).find(
+      (s) =>
+        String(s.licenseKey || "").toUpperCase() === code &&
+        s.status === "active",
+    );
+    if (matchedSub) {
+      return sendJson(res, 200, {
+        valid: true,
+        subscription: {
+          id: matchedSub.id,
+          customerName: matchedSub.name,
+          customerEmail: matchedSub.email,
+          licenseKey: matchedSub.licenseKey,
+          plan: matchedSub.plan || "Paket Pro",
+          pricePaid: matchedSub.price || 25000,
+          status: "active",
+          expiresAt: matchedSub.expiresAt,
+          downloadsCount: matchedSub.downloadsCount || 0,
+        },
+      });
+    }
+
     return sendJson(res, 200, {
-      valid: true,
-      subscription: {
-        id: matchedUser.id,
-        customerName: matchedUser.name,
-        customerEmail: matchedUser.email,
-        licenseKey: matchedUser.desktopActivationCode,
-        plan: "Paket Pro (Desktop Offline)",
-        pricePaid: 25000,
-        status: "active",
-        expiresAt: matchedUser.proExpiresAt,
-        downloadsCount: matchedUser.downloadsCount || 0,
-      },
+      valid: false,
+      error: "Kode aktivasi desktop tidak ditemukan atau belum aktif.",
     });
   }
 
