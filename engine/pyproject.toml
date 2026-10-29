@@ -24,7 +24,7 @@ engine = [
     # Lets the image's init script read aiEngine.enabled from settings.yml before starting us.
     "pyyaml>=6.0.3",
     "sqlite-vec>=0.1.9",
-    "uvicorn>=0.52.4",
+    "uvicorn>=0.54.0",
 ]
 # Type checking, testing, model generation, and formatting tools for the engine.
 engine-dev = [
