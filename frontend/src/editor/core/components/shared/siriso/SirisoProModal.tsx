@@ -634,10 +634,30 @@ export function SirisoProModal() {
                     >
                       <span>
                         {proState.proStatus === "pending"
-                          ? "Menunggu Aktivasi"
-                          : "Akun Gratis"}
+                          ? "Menunggu Konfirmasi"
+                          : "Belum Aktif (Perlu Bayar)"}
                       </span>
                     </span>
+                  </div>
+
+                  <div
+                    className="siriso-pm-locked-banner"
+                    data-testid="siriso-workspace-locked-banner"
+                  >
+                    <div className="siriso-pm-locked-banner-icon">
+                      <Icon name="lock" size="1.05rem" />
+                    </div>
+                    <div className="siriso-pm-locked-banner-text">
+                      <h4 className="siriso-pm-locked-banner-title">
+                        Akses Workspace Terkunci — Paket Pro Diperlukan
+                      </h4>
+                      <p className="siriso-pm-locked-banner-desc">
+                        Saat ini Siriso PDF mewajibkan langganan{" "}
+                        <strong>Paket Pro aktif</strong> untuk membuka
+                        Workspace dan seluruh fiturnya. Selesaikan pembayaran
+                        QRIS di bawah ini untuk membuka akses seketika.
+                      </p>
+                    </div>
                   </div>
 
                   {!activeQrisOrder || activeQrisOrder.status === "expired" ? (
@@ -733,12 +753,14 @@ export function SirisoProModal() {
                               </span>
                               <button
                                 type="button"
-                                className="siriso-pm-btn siriso-pm-btn-secondary siriso-pm-btn-sm"
+                                className="siriso-pm-btn-copy"
                                 onClick={handleCopyQrisNominal}
+                                title="Salin nominal unik"
+                                data-testid="siriso-qris-copy-btn"
                               >
                                 <Icon name="copy" size="0.85rem" />
                                 <span>
-                                  {copiedNominal ? "Tersalin" : "Salin"}
+                                  {copiedNominal ? "Tersalin!" : "Salin"}
                                 </span>
                               </button>
                             </div>
@@ -807,56 +829,30 @@ export function SirisoProModal() {
                     </div>
                   )}
 
-                  <div className="siriso-pm-panel">
-                    <p className="siriso-pm-panel-title">
-                      <Icon name="lock" size="1rem" />
-                      <span>Siriso PDF Desktop (Windows x64)</span>
-                    </p>
-                    <p className="siriso-pm-panel-desc">
-                      Terkunci — Tautan unduhan installer Desktop beserta{" "}
-                      <strong>Kode Aktivasi Offline</strong> akan langsung
-                      muncul di sini setelah akun Anda berstatus Pro.
-                    </p>
-                  </div>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      flexWrap: "wrap",
-                      gap: "0.6rem",
-                    }}
-                  >
+                  <div className="siriso-pm-actions-row">
                     <button
                       type="button"
-                      className="siriso-pm-btn siriso-pm-btn-secondary siriso-pm-btn-sm"
-                      onClick={() => enterWorkspace()}
-                      data-testid="siriso-modal-enter-workspace-btn"
+                      className="siriso-pm-btn siriso-pm-btn-secondary"
+                      onClick={handleRefreshAccount}
+                      disabled={isChecking}
+                      data-testid="siriso-refresh-status-btn"
                     >
-                      <Icon name="layout-grid" size="0.9rem" />
-                      <span>Buka Workspace PDF</span>
+                      <Icon name="refresh-cw" size="0.9rem" />
+                      <span>
+                        {isChecking
+                          ? "Memeriksa Status..."
+                          : "Cek Status Pembayaran"}
+                      </span>
                     </button>
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
-                      <button
-                        type="button"
-                        className="siriso-pm-btn siriso-pm-btn-secondary siriso-pm-btn-sm"
-                        onClick={handleRefreshAccount}
-                        disabled={isChecking}
-                        data-testid="siriso-refresh-status-btn"
-                      >
-                        <Icon name="refresh-cw" size="0.9rem" />
-                        <span>Cek Status Pro</span>
-                      </button>
-                      <button
-                        type="button"
-                        className="siriso-pm-btn siriso-pm-btn-secondary siriso-pm-btn-sm"
-                        onClick={handleLogout}
-                        data-testid="siriso-logout-btn"
-                      >
-                        <Icon name="log-out" size="0.9rem" />
-                        <span>Keluar Akun</span>
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      className="siriso-pm-btn siriso-pm-btn-secondary"
+                      onClick={handleLogout}
+                      data-testid="siriso-logout-btn"
+                    >
+                      <Icon name="log-out" size="0.9rem" />
+                      <span>Keluar Akun</span>
+                    </button>
                   </div>
                 </div>
               )}

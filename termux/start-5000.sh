@@ -24,11 +24,13 @@ if ! command -v node >/dev/null 2>&1; then
   fi
 fi
 
-if [ ! -f "$SCRIPT_DIR/public/index.html" ] && [ -f "$SCRIPT_DIR/siriso-web-dist.tar.gz" ]; then
-  echo "[Termux] Mengekstrak bundle produksi Siriso PDF..."
-  mkdir -p "$SCRIPT_DIR/public"
-  tar -xzf "$SCRIPT_DIR/siriso-web-dist.tar.gz" -C "$SCRIPT_DIR/public"
-  echo "[Termux] Bundle web berhasil diekstrak."
+if [ -f "$SCRIPT_DIR/siriso-web-dist.tar.gz" ]; then
+  if [ ! -f "$SCRIPT_DIR/public/index.html" ] || [ "$SCRIPT_DIR/siriso-web-dist.tar.gz" -nt "$SCRIPT_DIR/public/index.html" ]; then
+    echo "[Termux] Mengekstrak bundle produksi Siriso PDF terbaru..."
+    mkdir -p "$SCRIPT_DIR/public"
+    tar -xzf "$SCRIPT_DIR/siriso-web-dist.tar.gz" -C "$SCRIPT_DIR/public"
+    echo "[Termux] Bundle web berhasil diperbarui."
+  fi
 fi
 
 LAN_IP=""

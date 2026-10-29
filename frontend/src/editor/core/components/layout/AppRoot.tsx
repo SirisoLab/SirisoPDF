@@ -16,11 +16,11 @@ const DocsPage = lazy(() => import("@editor/components/docs/DocsPage"));
 
 function AppContent() {
   const { pathname } = useLocation();
-  const { isLandingOpen, isLoggedIn } = useSirisoPro();
+  const { isLandingOpen, isPro } = useSirisoPro();
   const path = stripBasePath(pathname);
   const isTestMode = import.meta.env.MODE === "test";
 
-  if (!isTestMode && !isLoggedIn) {
+  if (!isTestMode && !isPro) {
     return <SirisoLandingPage />;
   }
 

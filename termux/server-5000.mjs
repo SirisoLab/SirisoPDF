@@ -51,19 +51,29 @@ const DATA_FILE = resolveDefaultDataFile();
 
 function ensureWebBundleExtracted() {
   const indexHtml = path.join(PUBLIC_DIR, "index.html");
-  if (fs.existsSync(indexHtml)) {
-    return;
-  }
   if (!fs.existsSync(ARCHIVE_FILE)) {
-    console.error("[Siriso Termux] Bundle web tidak ditemukan:", ARCHIVE_FILE);
+    if (!fs.existsSync(indexHtml)) {
+      console.error("[Siriso Termux] Bundle web tidak ditemukan:", ARCHIVE_FILE);
+    }
     return;
   }
-  console.log("[Siriso Termux] Mengekstrak bundle web produksi ke termux/public ...");
+
+  const archiveStat = fs.statSync(ARCHIVE_FILE);
+  if (fs.existsSync(indexHtml)) {
+    const indexStat = fs.statSync(indexHtml);
+    if (indexStat.mtimeMs >= archiveStat.mtimeMs) {
+      return;
+    }
+    console.log("[Siriso Termux] Arsip bundle web baru ditemukan. Memperbarui " + PUBLIC_DIR + " ...");
+  } else {
+    console.log("[Siriso Termux] Mengekstrak bundle web produksi ke " + PUBLIC_DIR + " ...");
+  }
+
   fs.mkdirSync(PUBLIC_DIR, { recursive: true });
   execFileSync("tar", ["-xzf", ARCHIVE_FILE, "-C", PUBLIC_DIR], {
     stdio: "inherit",
   });
-  console.log("[Siriso Termux] Ekstraksi selesai.");
+  console.log("[Siriso Termux] Ekstraksi bundle web selesai.");
 }
 
 ensureWebBundleExtracted();
@@ -742,6 +752,24 @@ async function handleSirisoPdfApi(req, res, urlObj) {
 async function handleAppV1Api(req, res, urlObj) {
   const pathname = urlObj.pathname;
 
+  if (
+    pathname === "/api/v1/policies" ||
+    pathname.startsWith("/api/v1/policies/")
+  ) {
+    return sendJson(res, 200, []);
+  }
+
+  if (
+    pathname === "/api/v1/notifications" ||
+    pathname.startsWith("/api/v1/notifications")
+  ) {
+    return sendJson(res, 200, {
+      notifications: [],
+      viewerReviewsTeam: false,
+      viewerKey: null,
+    });
+  }
+
   if (JAVA_UPSTREAM_PORT !== PORT) {
     const proxied = await tryProxyRequest(req, res, JAVA_UPSTREAM_PORT);
     if (proxied) return;
@@ -775,24 +803,6 @@ async function handleAppV1Api(req, res, urlObj) {
       status: "UP",
       version: "3.2.2-termux",
       uptime: Math.floor(process.uptime()),
-    });
-  }
-
-  if (
-    pathname === "/api/v1/policies" ||
-    pathname.startsWith("/api/v1/policies/")
-  ) {
-    return sendJson(res, 200, []);
-  }
-
-  if (
-    pathname === "/api/v1/notifications" ||
-    pathname.startsWith("/api/v1/notifications")
-  ) {
-    return sendJson(res, 200, {
-      notifications: [],
-      viewerReviewsTeam: false,
-      viewerKey: null,
     });
   }
 

@@ -19,12 +19,15 @@ const mocks = vi.hoisted(() => ({
   addFiles: vi.fn().mockResolvedValue(undefined),
 }));
 
+let mockContextState: Record<string, any> = {};
+
 vi.mock("@editor/contexts/SirisoProContext", () => ({
   useSirisoPro: () => ({
     isPro: false,
     isLoggedIn: false,
     proState: { isPro: false },
     adsConfig: { priceFormatted: "Rp 25.000 / bulan" },
+    activeQrisOrder: undefined,
     isProModalOpen: true,
     pendingWorkspaceEntry: true,
     openProModal: mocks.openProModal,
@@ -37,6 +40,7 @@ vi.mock("@editor/contexts/SirisoProContext", () => ({
     refreshStatus: mocks.refreshStatus,
     isChecking: false,
     enterWorkspace: mocks.enterWorkspace,
+    ...mockContextState,
   }),
 }));
 
@@ -128,6 +132,7 @@ describe("SirisoLandingPage", () => {
   });
 
   it("renders SirisoProModal with account login/register and no Backoffice link", () => {
+    mockContextState = { isLoggedIn: false, isPro: false };
     render(<SirisoProModal />);
 
     expect(screen.getByTestId("siriso-pro-modal")).toBeInTheDocument();
@@ -137,6 +142,69 @@ describe("SirisoLandingPage", () => {
 
     fireEvent.click(screen.getByTestId("siriso-tab-register"));
     expect(screen.getByTestId("siriso-input-name")).toBeInTheDocument();
+  });
+
+  it("locks workspace for free tier and requires immediate QRIS payment without workspace enter button", () => {
+    mockContextState = {
+      isLoggedIn: true,
+      isPro: false,
+      proState: {
+        isPro: false,
+        customerName: "Hanz PM",
+        customerEmail: "hanzputra06@gmail.com",
+      },
+      activeQrisOrder: {
+        orderId: "QRIS-TEST-123",
+        merchantName: "SIRISO LAB",
+        nmid: "ID2026SIRISOLAB001",
+        qrisImageUrl: "https://example.com/qris.png",
+        formattedTotal: "Rp 25.432",
+        totalAmount: 25432,
+        status: "pending",
+        supportedApps: "BCA, Mandiri, BRI, GoPay, DANA",
+      },
+    };
+
+    render(<SirisoProModal />);
+
+    expect(
+      screen.getByTestId("siriso-workspace-locked-banner"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("siriso-modal-enter-workspace-btn"),
+    ).not.toBeInTheDocument();
+    expect(screen.getByTestId("siriso-qris-gateway-card")).toBeInTheDocument();
+    expect(screen.getByTestId("siriso-qris-amount")).toHaveTextContent(
+      "Rp 25.432",
+    );
+    expect(screen.getByTestId("siriso-confirm-qris-btn")).toBeInTheDocument();
+    expect(screen.getByTestId("siriso-refresh-status-btn")).toBeInTheDocument();
+  });
+
+  it("unlocks workspace entry and desktop download button when user is active Pro", () => {
+    mockContextState = {
+      isLoggedIn: true,
+      isPro: true,
+      proState: {
+        isPro: true,
+        proStatus: "active",
+        customerName: "Hanz Pro",
+        customerEmail: "pro@sirisolab.com",
+        desktopActivationCode: "SRP-DESK-9999",
+      },
+    };
+
+    render(<SirisoProModal />);
+
+    expect(
+      screen.getByTestId("siriso-modal-enter-workspace-btn"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId("siriso-download-desktop-btn"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("siriso-workspace-locked-banner"),
+    ).not.toBeInTheDocument();
   });
 });
 

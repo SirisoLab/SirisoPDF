@@ -84,7 +84,8 @@ function getInitialLandingState(): boolean {
   if (typeof window === "undefined") return false;
   if (import.meta.env.MODE === "test") return false;
   const stored = getStoredProState();
-  if (!hasAuthenticatedAccount(stored)) {
+  const isUserPro = Boolean(stored.isPro && stored.proStatus === "active");
+  if (!isUserPro) {
     return true;
   }
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
@@ -110,6 +111,7 @@ export function SirisoProProvider({ children }: { children: ReactNode }) {
   const [isChecking, setIsChecking] = useState(false);
 
   const isLoggedIn = hasAuthenticatedAccount(proState);
+  const isPro = Boolean(proState.isPro);
 
   const openProModal = useCallback(() => {
     setPendingWorkspaceEntry(false);
@@ -138,7 +140,7 @@ export function SirisoProProvider({ children }: { children: ReactNode }) {
 
   const enterWorkspace = useCallback(
     (onEntered?: () => void) => {
-      if (isLoggedIn) {
+      if (isLoggedIn && isPro) {
         setIsLandingOpen(false);
         setPendingWorkspaceEntry(false);
         setIsProModalOpen(false);
@@ -148,8 +150,18 @@ export function SirisoProProvider({ children }: { children: ReactNode }) {
       pendingWorkspaceCallbackRef.current = onEntered ?? null;
       setPendingWorkspaceEntry(true);
       setIsProModalOpen(true);
+      if (isLoggedIn && !isPro && !activeQrisOrder) {
+        const token = proState.authToken || getStoredProState().authToken;
+        if (token) {
+          void createSirisoQrisPayment(token).then((res) => {
+            if (res.success && res.order) {
+              setActiveQrisOrder(res.order);
+            }
+          });
+        }
+      }
     },
-    [isLoggedIn],
+    [isLoggedIn, isPro, activeQrisOrder, proState.authToken],
   );
 
   const refreshStatus = useCallback(async () => {
@@ -204,8 +216,21 @@ export function SirisoProProvider({ children }: { children: ReactNode }) {
           const nextState = mapUserToProState(res.user, res.token);
           setProState(nextState);
           saveStoredProState(nextState);
-          if (pendingWorkspaceEntry) {
-            completePendingWorkspaceEntry();
+          if (nextState.isPro) {
+            if (pendingWorkspaceEntry) {
+              completePendingWorkspaceEntry();
+            }
+          } else {
+            // Free tier cannot enter workspace - must pay directly via QRIS
+            setPendingWorkspaceEntry(true);
+            setIsProModalOpen(true);
+            if (res.token) {
+              void createSirisoQrisPayment(res.token).then((qrisRes) => {
+                if (qrisRes.success && qrisRes.order) {
+                  setActiveQrisOrder(qrisRes.order);
+                }
+              });
+            }
           }
           return { success: true, message: res.message };
         }
@@ -226,8 +251,21 @@ export function SirisoProProvider({ children }: { children: ReactNode }) {
           const nextState = mapUserToProState(res.user, res.token);
           setProState(nextState);
           saveStoredProState(nextState);
-          if (pendingWorkspaceEntry) {
-            completePendingWorkspaceEntry();
+          if (nextState.isPro) {
+            if (pendingWorkspaceEntry) {
+              completePendingWorkspaceEntry();
+            }
+          } else {
+            // Free tier cannot enter workspace - must pay directly via QRIS
+            setPendingWorkspaceEntry(true);
+            setIsProModalOpen(true);
+            if (res.token) {
+              void createSirisoQrisPayment(res.token).then((qrisRes) => {
+                if (qrisRes.success && qrisRes.order) {
+                  setActiveQrisOrder(qrisRes.order);
+                }
+              });
+            }
           }
           return { success: true, message: res.message };
         }
@@ -315,6 +353,9 @@ export function SirisoProProvider({ children }: { children: ReactNode }) {
             const nextState = mapUserToProState(res.user, token);
             setProState(nextState);
             saveStoredProState(nextState);
+            if (nextState.isPro && pendingWorkspaceEntry) {
+              completePendingWorkspaceEntry();
+            }
           }
           return {
             success: true,
@@ -327,7 +368,7 @@ export function SirisoProProvider({ children }: { children: ReactNode }) {
         setIsChecking(false);
       }
     },
-    [proState.authToken],
+    [proState.authToken, pendingWorkspaceEntry, completePendingWorkspaceEntry],
   );
 
   const checkQrisPaymentStatus = useCallback(
@@ -346,10 +387,18 @@ export function SirisoProProvider({ children }: { children: ReactNode }) {
           const nextState = mapUserToProState(res.user, token);
           setProState(nextState);
           saveStoredProState(nextState);
+          if (nextState.isPro && pendingWorkspaceEntry) {
+            completePendingWorkspaceEntry();
+          }
         }
       }
     },
-    [proState.authToken, activeQrisOrder?.orderId],
+    [
+      proState.authToken,
+      activeQrisOrder?.orderId,
+      pendingWorkspaceEntry,
+      completePendingWorkspaceEntry,
+    ],
   );
 
   const activateLicense = useCallback(

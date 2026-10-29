@@ -79,10 +79,15 @@ export interface FetchedNotifications {
   viewerKey: string | null;
 }
 
+let notificationsAvailable = true;
+
 /** Newest first. Empty rather than throwing, and defaulting to the least hiding. */
 export async function fetchNotifications(
   limit = 20,
 ): Promise<FetchedNotifications> {
+  if (!notificationsAvailable) {
+    return { notifications: [], viewerReviewsTeam: true, viewerKey: null };
+  }
   try {
     const response = await apiClient.get<NotificationsResponse>(
       `${NOTIFICATIONS_PATH}?limit=${limit}`,
@@ -94,6 +99,7 @@ export async function fetchNotifications(
       viewerKey: response?.data?.viewerKey || null,
     };
   } catch {
+    notificationsAvailable = false;
     return { notifications: [], viewerReviewsTeam: true, viewerKey: null };
   }
 }
