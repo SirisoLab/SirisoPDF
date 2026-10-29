@@ -62,23 +62,39 @@
 
 ---
 
-## Cara Menjalankan di Lokal (Quick Start)
+## Cara Menjalankan di Lokal & Server Android Termux (Port 5000)
 
-### 1. Menjalankan Server Produksi (`stirling-pdf.jar`)
-```powershell
-java -jar dist\native\stirling-pdf.jar
+### 1. Menjalankan di Server Android (Termux) — Port `5000`
+Server khusus Android Termux (`termux/server-5000.mjs`) sudah menyertakan bundle web produksi siap pakai (`termux/siriso-web-dist.tar.gz`) sehingga perangkat Android tidak perlu melakukan kompilasi berat:
+
+```bash
+pkg update -y && pkg install -y git nodejs tar
+git clone https://github.com/hanzputram/SirisoPDF.git
+cd SirisoPDF
+bash termux/start-5000.sh
 ```
-Buka di browser: **`http://localhost:8080`**
 
-### 2. Menjalankan Mode Pengembangan Frontend (`Vite`)
+Untuk menjalankan di *background* (24/7 dengan `termux-wake-lock` dan `nohup`):
+```bash
+bash termux/start-5000.sh --bg
+```
+Buka di browser: **`http://localhost:5000`** (atau **`http://<IP-ANDROID>:5000`** dari perangkat lain di jaringan Wi-Fi yang sama).
+
+### 2. Menjalankan Server Produksi Java (`stirling-pdf.jar`) di Port `5000`
+```powershell
+java -Dserver.port=5000 -jar dist\native\stirling-pdf.jar --server.port=5000
+```
+Buka di browser: **`http://localhost:5000`**
+
+### 3. Menjalankan Mode Pengembangan Frontend (`Vite`) di Port `5000`
 ```powershell
 cd frontend
 npm install
-npx vite --mode core --port 5173
+npx vite --mode core --host 0.0.0.0 --port 5000
 ```
-Buka di browser: **`http://localhost:5173`**
+Buka di browser: **`http://localhost:5000`**
 
-### 3. Menggunakan Task Runner (`Taskfile`)
+### 4. Menggunakan Task Runner (`Taskfile`)
 ```bash
 task dev            # Menjalankan backend + frontend secara bersamaan
 task frontend:check # Menjalankan lint, theme-lint, icon-lint, typecheck, dan unit test frontend

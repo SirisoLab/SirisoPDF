@@ -323,3 +323,11 @@ docs/type3/signatures/
 # Local screenshot artifacts from *-screenshots.spec.ts
 frontend/screenshots/
 frontend/src-tauri/libs/.variant
+
+# Termux runtime directories
+!termux/siriso-web-dist.tar.gz
+termux/public/
+termux/data/
+termux/uploads/
+termux/*.log
+termux/*.pid

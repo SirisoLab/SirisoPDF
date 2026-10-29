@@ -92,7 +92,72 @@ export interface SirisoAdsConfig {
 }
 
 const STORAGE_KEY = "siriso_pro_auth_v1";
-const BACKOFFICE_BASE = "http://localhost:8000";
+
+let cachedBackofficeBase: string | null = null;
+
+function getBackofficeCandidates(): string[] {
+  const host = globalThis.location?.hostname || "localhost";
+  const protocol = globalThis.location?.protocol || "http:";
+  const origin = globalThis.location?.origin || "http://localhost:5000";
+  const candidates: string[] = [];
+
+  if (cachedBackofficeBase !== null) {
+    candidates.push(cachedBackofficeBase);
+  }
+
+  candidates.push(origin);
+
+  if (protocol === "http:") {
+    candidates.push(`http://${host}:8000`);
+  }
+
+  candidates.push("http://localhost:8000");
+  candidates.push("https://sirisolab.com");
+
+  return Array.from(new Set(candidates));
+}
+
+async function fetchSirisoApi(
+  apiPath: string,
+  init?: RequestInit,
+): Promise<Response> {
+  const candidates = getBackofficeCandidates();
+  let lastError: unknown = null;
+  let lastResponse: Response | null = null;
+
+  for (const base of candidates) {
+    try {
+      const response = await fetch(`${base}${apiPath}`, init);
+      const contentType = response.headers.get("content-type") || "";
+      if (
+        response.status !== 404 &&
+        response.status !== 502 &&
+        contentType.includes("application/json")
+      ) {
+        cachedBackofficeBase = base;
+        return response;
+      }
+      lastResponse = response;
+    } catch (err) {
+      lastError = err;
+    }
+  }
+
+  if (lastResponse) {
+    return lastResponse;
+  }
+  throw lastError ?? new Error("Unable to reach Siriso API");
+}
+
+function getActiveBackofficeBase(): string {
+  if (cachedBackofficeBase !== null) return cachedBackofficeBase;
+  const host = globalThis.location?.hostname || "localhost";
+  const protocol = globalThis.location?.protocol || "http:";
+  if (protocol === "http:") {
+    return `http://${host}:8000`;
+  }
+  return globalThis.location?.origin || "https://sirisolab.com";
+}
 
 export const DEFAULT_ADS_CONFIG: SirisoAdsConfig = {
   enabled: true,
@@ -220,9 +285,29 @@ export function mapUserToProState(
   };
 }
 
+function normalizeQrisOrder(
+  order?: SirisoQrisOrder | null,
+): SirisoQrisOrder | undefined {
+  if (!order) return undefined;
+  if (
+    order.qrisImageUrl &&
+    order.qrisImageUrl.startsWith("http://localhost:8000/")
+  ) {
+    const activeBase = getActiveBackofficeBase();
+    return {
+      ...order,
+      qrisImageUrl: order.qrisImageUrl.replace(
+        "http://localhost:8000",
+        activeBase,
+      ),
+    };
+  }
+  return order;
+}
+
 export async function fetchSirisoAdsConfig(): Promise<SirisoAdsConfig> {
   try {
-    const response = await fetch(`${BACKOFFICE_BASE}/api/siriso-pdf/config`, {
+    const response = await fetchSirisoApi("/api/siriso-pdf/config", {
       method: "GET",
       headers: { Accept: "application/json" },
     });
@@ -312,17 +397,14 @@ export async function loginSirisoAccount(
   user?: SirisoProUser;
 }> {
   try {
-    const response = await fetch(
-      `${BACKOFFICE_BASE}/api/siriso-pdf/auth/login`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ email: email.trim(), password }),
+    const response = await fetchSirisoApi("/api/siriso-pdf/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
-    );
+      body: JSON.stringify({ email: email.trim(), password }),
+    });
     const data = await response.json();
     if (response.ok && data.ok && data.user) {
       return {
@@ -355,21 +437,18 @@ export async function registerSirisoAccount(
   user?: SirisoProUser;
 }> {
   try {
-    const response = await fetch(
-      `${BACKOFFICE_BASE}/api/siriso-pdf/auth/register`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim(),
-          password,
-        }),
+    const response = await fetchSirisoApi("/api/siriso-pdf/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
-    );
+      body: JSON.stringify({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+      }),
+    });
     const data = await response.json();
     if (response.ok && data.ok && data.user) {
       return {
@@ -397,8 +476,8 @@ export async function fetchSirisoAccountMe(token: string): Promise<{
 }> {
   if (!token) return { success: false };
   try {
-    const response = await fetch(
-      `${BACKOFFICE_BASE}/api/siriso-pdf/auth/me?token=${encodeURIComponent(token)}`,
+    const response = await fetchSirisoApi(
+      `/api/siriso-pdf/auth/me?token=${encodeURIComponent(token)}`,
       {
         method: "GET",
         headers: {
@@ -423,8 +502,8 @@ export async function requestSirisoProUpgrade(token: string): Promise<{
   user?: SirisoProUser;
 }> {
   try {
-    const response = await fetch(
-      `${BACKOFFICE_BASE}/api/siriso-pdf/auth/request-upgrade`,
+    const response = await fetchSirisoApi(
+      "/api/siriso-pdf/auth/request-upgrade",
       {
         method: "POST",
         headers: {
@@ -467,8 +546,8 @@ export async function createSirisoQrisPayment(
   user?: SirisoProUser;
 }> {
   try {
-    const response = await fetch(
-      `${BACKOFFICE_BASE}/api/siriso-pdf/payment/create-qris`,
+    const response = await fetchSirisoApi(
+      "/api/siriso-pdf/payment/create-qris",
       {
         method: "POST",
         headers: {
@@ -484,7 +563,7 @@ export async function createSirisoQrisPayment(
       return {
         success: true,
         message: "Tagihan QRIS berhasil dibuat.",
-        order: data.order,
+        order: normalizeQrisOrder(data.order),
         user: data.user,
       };
     }
@@ -512,8 +591,8 @@ export async function fetchSirisoQrisPaymentStatus(
   try {
     const params = new URLSearchParams({ token });
     if (orderId) params.set("orderId", orderId);
-    const response = await fetch(
-      `${BACKOFFICE_BASE}/api/siriso-pdf/payment/status?${params.toString()}`,
+    const response = await fetchSirisoApi(
+      `/api/siriso-pdf/payment/status?${params.toString()}`,
       {
         method: "GET",
         headers: {
@@ -526,7 +605,7 @@ export async function fetchSirisoQrisPaymentStatus(
     if (response.ok && data.ok) {
       return {
         success: true,
-        order: data.order ?? null,
+        order: normalizeQrisOrder(data.order) ?? null,
         user: data.user,
       };
     }
@@ -547,8 +626,8 @@ export async function confirmSirisoQrisPayment(
   user?: SirisoProUser;
 }> {
   try {
-    const response = await fetch(
-      `${BACKOFFICE_BASE}/api/siriso-pdf/payment/confirm-qris`,
+    const response = await fetchSirisoApi(
+      "/api/siriso-pdf/payment/confirm-qris",
       {
         method: "POST",
         headers: {
@@ -570,7 +649,7 @@ export async function confirmSirisoQrisPayment(
         message:
           data.message ||
           "Konfirmasi pembayaran QRIS berhasil dikirim untuk diverifikasi.",
-        order: data.order,
+        order: normalizeQrisOrder(data.order),
         user: data.user,
       };
     }
@@ -600,8 +679,8 @@ export async function verifySirisoLicense(licenseKey: string): Promise<{
   }
 
   try {
-    const response = await fetch(
-      `${BACKOFFICE_BASE}/api/siriso-pdf/verify-desktop-code`,
+    const response = await fetchSirisoApi(
+      "/api/siriso-pdf/verify-desktop-code",
       {
         method: "POST",
         headers: {
@@ -661,5 +740,5 @@ export function getSirisoDesktopDownloadUrl(
   if (licenseKey) params.set("key", licenseKey);
   if (authToken) params.set("token", authToken);
   const query = params.toString();
-  return `${BACKOFFICE_BASE}/api/siriso-pdf/download-desktop${query ? `?${query}` : ""}`;
+  return `${getActiveBackofficeBase()}/api/siriso-pdf/download-desktop${query ? `?${query}` : ""}`;
 }
