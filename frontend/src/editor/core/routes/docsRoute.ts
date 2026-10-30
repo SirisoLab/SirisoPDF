@@ -2,8 +2,7 @@
 export const DOCS_PATH = "/docs";
 
 /**
- * Whether this build ships the documentation browser. Every build does: the
- * manifest and the view live in core, so no edition has to resolve another
- * tree to render them.
+ * Whether this build ships the documentation browser. Disabled for Siriso PDF
+ * so the documentation (?) button is removed from the navigation rail.
  */
-export const HAS_DOCS = true;
+export const HAS_DOCS = false;
