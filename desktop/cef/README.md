@@ -97,3 +97,23 @@ exercise file dialogs/printing and test installed OCR/converters with sample
 documents. Keep Chromium/CEF updated and review the included notices before
 redistribution. Missing external PDF tools retain upstream feature-disable
 behavior; the launcher cannot supply their functionality by itself.
+
+## Windows installer
+
+`installer/build-installer.ps1` turns the launcher into `Siriso-PDF-Setup-<version>.exe`.
+Users then do not need a Java install. It needs JDK 25 (with `jlink` and `jpackage`)
+and Inno Setup 6, and takes the newest core boot JAR from `app/core/build/libs`:
+
+```text
+gradlew.bat :stirling-pdf:bootJar -PbuildWithFrontend=true -PbuildWithPortal=false -PfrontendMode=core
+powershell -ExecutionPolicy Bypass -File desktop\cef\installer\build-installer.ps1 -Version 1.0.0
+```
+
+The script links a Java runtime that keeps `bin\java.exe`, which the launcher uses
+for the backend JVM. It builds a jpackage app image with `Siriso PDF.exe`, puts
+`backend\` beside `app\` where `Launcher` looks for it, and compiles
+`installer/siriso-pdf.iss`. The installer is per-user by default (no administrator
+prompt) and adds Start menu and optional desktop shortcuts plus an uninstaller.
+User data in `%LOCALAPPDATA%\SirisoPDF-CEF` survives uninstall. Output lands in
+`desktop/cef/build/installer/output/`. Keep `AppId` in the `.iss` unchanged so
+upgrades replace earlier installs.
