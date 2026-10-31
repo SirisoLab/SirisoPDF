@@ -25,6 +25,7 @@ import {
   registerSirisoAccount,
   requestSirisoProUpgrade,
   saveStoredProState,
+  SIRISO_ACCESS_DENIED_EVENT,
   SIRISO_AUTH_STORAGE_KEY,
   SirisoAccessPolicy,
   SirisoAdsConfig,
@@ -503,9 +504,13 @@ export function SirisoProProvider({ children }: { children: ReactNode }) {
       () => void revalidate(true),
       REVALIDATE_MS,
     );
+    // The engine's paywall can know first that Pro lapsed or the session was revoked.
+    const onEngineDenied = () => void revalidate(true);
+    window.addEventListener(SIRISO_ACCESS_DENIED_EVENT, onEngineDenied);
     return () => {
       document.removeEventListener("visibilitychange", onVisible);
       window.clearInterval(timer);
+      window.removeEventListener(SIRISO_ACCESS_DENIED_EVENT, onEngineDenied);
     };
   }, [revalidate]);
 

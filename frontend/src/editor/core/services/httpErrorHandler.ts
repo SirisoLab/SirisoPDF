@@ -6,7 +6,7 @@ import {
   normalizeAxiosErrorData,
 } from "@editor/services/errorUtils";
 import { showSpecialErrorToast } from "@editor/services/specialErrorToasts";
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 import { handleSaaSError } from "@editor/services/saasErrorInterceptor";
 import {
   clampText,
@@ -15,6 +15,43 @@ import {
 import { stripBasePath, withBasePath } from "@editor/constants/app";
 import { isSafePostLoginRedirect } from "@editor/services/postLoginRedirect";
 import { reportAccountLinkBlock } from "@editor/services/accountLinkBlock";
+import { SIRISO_ACCESS_DENIED_EVENT } from "@editor/services/sirisoProService";
+
+const SIRISO_DENIAL_FALLBACK: Record<string, string> = {
+  "login-required": "Silakan masuk ke akun Siriso PDF untuk memakai alat PDF.",
+  "pro-required":
+    "Akun Anda belum memiliki akses Workspace. Aktifkan Paket Pro untuk memakai alat PDF.",
+  unavailable:
+    "Layanan akun Siriso sedang tidak dapat dihubungi. Coba lagi sebentar lagi.",
+};
+
+/**
+ * The engine's Siriso paywall answered instead of the tool. Stirling's 401 handling would send the
+ * visitor to /login, which Siriso does not use, so the account is re-checked instead.
+ */
+async function handleSirisoDenial(
+  code: string,
+  error: AxiosError,
+): Promise<void> {
+  window.dispatchEvent(
+    new CustomEvent(SIRISO_ACCESS_DENIED_EVENT, { detail: code }),
+  );
+  if (error.config?.suppressErrorToast === true) return;
+  const body = await normalizeAxiosErrorData(error.response?.data).catch(
+    () => undefined,
+  );
+  const message = (body as { message?: unknown } | undefined)?.message;
+  alert({
+    alertType: "error",
+    title: "Siriso PDF",
+    body: clampText(
+      typeof message === "string" && message
+        ? message
+        : SIRISO_DENIAL_FALLBACK[code] || SIRISO_DENIAL_FALLBACK.unavailable,
+    ),
+    isPersistentPopup: false,
+  });
+}
 
 // Module-scoped state to reduce global variable usage
 const recentSpecialByEndpoint: Record<string, number> = {};
@@ -83,6 +120,11 @@ if (typeof window !== "undefined") {
  */
 export async function handleHttpError(error: unknown): Promise<boolean> {
   const axiosError = axios.isAxiosError(error) ? error : undefined;
+  const sirisoDenial = axiosError?.response?.headers?.["x-siriso-access"];
+  if (axiosError && typeof sirisoDenial === "string" && sirisoDenial) {
+    await handleSirisoDenial(sirisoDenial, axiosError);
+    return true;
+  }
   if (axiosError?.response?.status === 402) {
     const body = await normalizeAxiosErrorData(axiosError.response.data).catch(
       () => undefined,

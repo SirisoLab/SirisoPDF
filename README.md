@@ -114,6 +114,46 @@ Pengaturan harga langganan **Paket Pro**, manajemen akun pelanggan, upload gamba
 
 ---
 
+## Paywall di Sisi Server (`siriso.enforceAccess`)
+
+Gerbang Workspace di browser hanya tampilan: tanpa pengaturan ini, siapa pun bisa memanggil API pengolahan PDF (`/api/v1/**`) langsung dengan `curl`. Dengan `siriso.enforceAccess: true`, engine Java menolak setiap panggilan `/api/v1/**` yang tidak membawa token pelanggan Siriso (`Authorization: Bearer <token>`) milik akun yang diberi akses Workspace oleh backoffice. Keputusan diambil dari `user.access.workspace` pada `GET /api/siriso-pdf/auth/me` di backoffice, yang sudah memperhitungkan peran (Pelanggan/Tim Siriso/Admin), status Paket Pro, dan kebijakan akses.
+
+Aktifkan di `configs/custom_settings.yml` (berkas deployment, tidak masuk git), lalu restart engine:
+
+```yaml
+siriso:
+  enforceAccess: true                     # bawaan false: lokal/dev tetap terbuka
+  backofficeUrl: "http://localhost:8000"  # origin backoffice yang melayani /api/siriso-pdf/auth/me
+  cacheSeconds: 60                        # lama hasil cek token diingat per token
+  timeoutSeconds: 5                       # batas waktu panggilan ke backoffice
+```
+
+Variabel lingkungan juga bisa dipakai: `SIRISO_ENFORCEACCESS=true`, `SIRISO_BACKOFFICEURL=https://sirisolab.com`.
+
+| Kondisi | Status | Header `X-Siriso-Access` |
+| :--- | :--- | :--- |
+| Tanpa token, token kedaluwarsa/palsu, atau akun dihapus | `401` | `login-required` |
+| Akun gratis tanpa akses Workspace | `402` | `pro-required` |
+| Backoffice tidak bisa dihubungi | `503` | `unavailable` |
+| Akun Pro, Tim Siriso, atau Admin | diteruskan ke alat PDF | — |
+
+- **Tetap terbuka tanpa token**: `/api/v1/config/**` (termasuk `app-config`), `/api/v1/ui-data/**`, `/api/v1/info/status`, serta semua yang di luar `/api/v1/` (halaman web, aset, dan probe `/api/siriso-pdf/*`).
+- **Cache**: izin dan token tidak valid diingat selama `cacheSeconds`, sehingga Pro yang berakhir atau peran yang dicabut berlaku paling lambat dalam rentang itu. Penolakan akun gratis hanya diingat 5 detik agar akun yang baru membayar langsung bisa memakai alat. Gangguan backoffice tidak pernah di-cache.
+- **Frontend** otomatis mengirim token akun yang sedang masuk ke engine, dan menanggapi penolakan dengan memeriksa ulang akun, bukan mengarahkan ke `/login`.
+- **Belum didukung saat aktif**: unggahan Mobile Scanner/tanda tangan dari ponsel (ponsel tidak punya sesi Siriso), sesi web yang hanya diaktifkan dengan kode aktivasi desktop tanpa login akun, engine yang dipanggil dari origin lain (respons penolakan tidak membawa header CORS), dan build *proprietary* dengan login Stirling (header `Authorization` di sana dipakai JWT Stirling). Pengaturan ini dirancang untuk build `core` yang dipakai `dist/native/stirling-pdf.jar`.
+
+Uji cepat (`Sample.pdf` ada di `frontend/public/samples/`; token ada di `localStorage` kunci `siriso_pro_auth_v1` → `authToken`, atau di respons `POST /api/siriso-pdf/auth/login`):
+
+```bash
+curl -i -X POST http://localhost:5000/api/v1/general/rotate-pdf -F fileInput=@frontend/public/samples/Sample.pdf -F angle=90
+```
+
+```bash
+curl -i -X POST http://localhost:5000/api/v1/general/rotate-pdf -H "Authorization: Bearer <token>" -F fileInput=@frontend/public/samples/Sample.pdf -F angle=90
+```
+
+---
+
 ## Lisensi & Hak Cipta
 
 Dikembangkan dan dikelola oleh **Siriso Lab** ([sirisolab.com](https://sirisolab.com)). Lihat berkas [LICENSE](LICENSE) untuk informasi lisensi selengkapnya.

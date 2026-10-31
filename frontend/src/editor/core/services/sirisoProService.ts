@@ -140,6 +140,8 @@ export interface SirisoAdsConfig {
 const STORAGE_KEY = "siriso_pro_auth_v1";
 /** Exported so other tabs can follow sign-in / sign-out through the storage event. */
 export const SIRISO_AUTH_STORAGE_KEY = STORAGE_KEY;
+/** Fired when the engine's paywall refuses a call; `detail` is its X-Siriso-Access code. */
+export const SIRISO_ACCESS_DENIED_EVENT = "siriso-access-denied";
 const PUBLIC_CONFIG_KEY = "siriso_public_config_v1";
 
 let cachedBackofficeBase: string | null = null;
