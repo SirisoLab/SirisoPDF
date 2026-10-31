@@ -14,18 +14,35 @@
   --lp-card-hover: var(--p-zinc-800);
   --lp-border: color-mix(in srgb, var(--p-white) 9%, transparent);
   --lp-border-strong: color-mix(in srgb, var(--p-white) 16%, transparent);
-  --lp-border-orange: color-mix(in srgb, var(--p-siriso-orange-500) 42%, transparent);
+  --lp-border-orange: color-mix(
+    in srgb,
+    var(--p-siriso-orange-500) 42%,
+    transparent
+  );
   --lp-orange: var(--p-siriso-orange-500);
   --lp-orange-bright: var(--p-siriso-orange-400);
   --lp-orange-deep: var(--p-siriso-orange-600);
-  --lp-orange-soft: color-mix(in srgb, var(--p-siriso-orange-500) 14%, transparent);
-  --lp-orange-glow: color-mix(in srgb, var(--p-siriso-orange-500) 28%, transparent);
+  --lp-promo: var(--p-amber-400);
+  --lp-orange-soft: color-mix(
+    in srgb,
+    var(--p-siriso-orange-500) 14%,
+    transparent
+  );
+  --lp-orange-glow: color-mix(
+    in srgb,
+    var(--p-siriso-orange-500) 28%,
+    transparent
+  );
   --lp-text: var(--p-snow);
   --lp-text-secondary: var(--p-zinc-200);
   --lp-text-muted: var(--p-zinc-250);
-  --lp-font-display: "SirisoSyne", "Syne", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --lp-font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --lp-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --lp-font-display:
+    "SirisoSyne", "Syne", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --lp-font-body:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --lp-font-mono:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   position: relative;
   width: 100%;
@@ -47,9 +64,22 @@
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(circle at 16% 12%, color-mix(in srgb, var(--p-siriso-orange-500) 15%, transparent), transparent 42%),
-    radial-gradient(circle at 84% 22%, color-mix(in srgb, var(--p-siriso-orange-600) 12%, transparent), transparent 46%),
-    linear-gradient(180deg, var(--p-black) 0%, var(--p-zinc-950) 50%, var(--p-black) 100%);
+    radial-gradient(
+      circle at 16% 12%,
+      color-mix(in srgb, var(--p-siriso-orange-500) 15%, transparent),
+      transparent 42%
+    ),
+    radial-gradient(
+      circle at 84% 22%,
+      color-mix(in srgb, var(--p-siriso-orange-600) 12%, transparent),
+      transparent 46%
+    ),
+    linear-gradient(
+      180deg,
+      var(--p-black) 0%,
+      var(--p-zinc-950) 50%,
+      var(--p-black) 100%
+    );
 }
 
 .siriso-lp-grid-backdrop {
@@ -58,10 +88,22 @@
   pointer-events: none;
   z-index: 0;
   background-image:
-    linear-gradient(to right, color-mix(in srgb, var(--p-white) 3%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--p-white) 3%, transparent) 1px, transparent 1px);
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--p-white) 3%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--p-white) 3%, transparent) 1px,
+      transparent 1px
+    );
   background-size: 56px 56px;
-  mask-image: radial-gradient(ellipse 85% 70% at 50% 25%, black 35%, transparent 100%);
+  mask-image: radial-gradient(
+    ellipse 85% 70% at 50% 25%,
+    black 35%,
+    transparent 100%
+  );
 }
 
 .siriso-lp-container {
@@ -110,9 +152,14 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: color-mix(in srgb, var(--p-siriso-orange-500) 12%, var(--p-zinc-900));
+  background: color-mix(
+    in srgb,
+    var(--p-siriso-orange-500) 12%,
+    var(--p-zinc-900)
+  );
   border: 1px solid var(--lp-border-orange);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--p-siriso-orange-500) 24%, transparent);
+  box-shadow: 0 0 18px
+    color-mix(in srgb, var(--p-siriso-orange-500) 24%, transparent);
   transition: transform 0.35s ease;
 }
 
@@ -177,7 +224,9 @@
   border: none;
   cursor: pointer;
   white-space: nowrap;
-  transition: color 0.2s ease, background 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
 }
 
 .siriso-lp-nav-link:hover,
@@ -206,7 +255,9 @@
   border-radius: 999px;
   border: 1px solid var(--lp-border);
   white-space: nowrap;
-  transition: color 0.2s ease, border-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .siriso-lp-lab-link:hover {
@@ -227,7 +278,11 @@
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .siriso-lp-btn:focus-visible {
@@ -236,15 +291,21 @@
 }
 
 .siriso-lp-btn-primary {
-  background: linear-gradient(135deg, var(--p-siriso-orange-500) 0%, var(--p-siriso-orange-600) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--p-siriso-orange-500) 0%,
+    var(--p-siriso-orange-600) 100%
+  );
   color: var(--p-white);
-  border: 1px solid color-mix(in srgb, var(--p-siriso-orange-300) 45%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--p-siriso-orange-300) 45%, transparent);
   box-shadow: 0 6px 24px var(--lp-orange-glow);
 }
 
 .siriso-lp-btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 30px color-mix(in srgb, var(--p-siriso-orange-500) 45%, transparent);
+  box-shadow: 0 10px 30px
+    color-mix(in srgb, var(--p-siriso-orange-500) 45%, transparent);
 }
 
 .siriso-lp-btn-secondary {
@@ -255,7 +316,11 @@
 
 .siriso-lp-btn-secondary:hover {
   border-color: var(--lp-border-orange);
-  background: color-mix(in srgb, var(--p-siriso-orange-500) 12%, var(--p-zinc-900));
+  background: color-mix(
+    in srgb,
+    var(--p-siriso-orange-500) 12%,
+    var(--p-zinc-900)
+  );
 }
 
 .siriso-lp-btn-outline-orange {
@@ -293,7 +358,11 @@
   gap: 0.6rem;
   padding: 0.36rem 0.9rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--p-siriso-orange-500) 10%, var(--p-zinc-900));
+  background: color-mix(
+    in srgb,
+    var(--p-siriso-orange-500) 10%,
+    var(--p-zinc-900)
+  );
   border: 1px solid var(--lp-border-orange);
   font-family: var(--lp-font-mono);
   font-size: 0.74rem;
@@ -428,13 +497,20 @@
   background: color-mix(in srgb, var(--p-black) 60%, var(--p-zinc-900));
   border: 1.5px dashed var(--lp-border-orange);
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
   margin-bottom: 1.15rem;
 }
 
 .siriso-lp-dropzone:hover,
 .siriso-lp-dropzone--active {
-  background: color-mix(in srgb, var(--p-siriso-orange-500) 12%, var(--p-zinc-900));
+  background: color-mix(
+    in srgb,
+    var(--p-siriso-orange-500) 12%,
+    var(--p-zinc-900)
+  );
   border-color: var(--p-siriso-orange-400);
   transform: translateY(-2px);
 }
@@ -495,12 +571,19 @@
   border: 1px solid var(--lp-border);
   color: var(--lp-text);
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.15s ease;
 }
 
 .siriso-lp-quick-btn:hover {
   border-color: var(--lp-border-orange);
-  background: color-mix(in srgb, var(--p-siriso-orange-500) 12%, var(--p-zinc-900));
+  background: color-mix(
+    in srgb,
+    var(--p-siriso-orange-500) 12%,
+    var(--p-zinc-900)
+  );
   transform: translateY(-1px);
 }
 
@@ -542,7 +625,12 @@
 .siriso-lp-marquee {
   position: relative;
   z-index: 2;
-  background: linear-gradient(90deg, var(--p-siriso-orange-600), var(--p-siriso-orange-500), var(--p-siriso-orange-600));
+  background: linear-gradient(
+    90deg,
+    var(--p-siriso-orange-600),
+    var(--p-siriso-orange-500),
+    var(--p-siriso-orange-600)
+  );
   color: var(--p-black);
   padding: 0.75rem 0;
   border-top: 1px solid color-mix(in srgb, var(--p-white) 22%, transparent);
@@ -638,7 +726,10 @@
   color: var(--lp-text-secondary);
   border: 1px solid var(--lp-border);
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .siriso-lp-filter-tab:hover {
@@ -647,7 +738,11 @@
 }
 
 .siriso-lp-filter-tab--active {
-  background: linear-gradient(135deg, var(--p-siriso-orange-500), var(--p-siriso-orange-600));
+  background: linear-gradient(
+    135deg,
+    var(--p-siriso-orange-500),
+    var(--p-siriso-orange-600)
+  );
   color: var(--p-white);
   border-color: var(--p-siriso-orange-400);
 }
@@ -678,7 +773,10 @@
     var(--p-zinc-950) 100%
   );
   border: 1px solid var(--lp-border);
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .siriso-lp-feature-card:hover {
@@ -784,13 +882,19 @@
   justify-content: space-between;
   padding: 0.65rem 0.95rem;
   border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--p-siriso-orange-500) 10%, var(--p-zinc-900));
+  background: color-mix(
+    in srgb,
+    var(--p-siriso-orange-500) 10%,
+    var(--p-zinc-900)
+  );
   border: 1px solid var(--lp-border-orange);
   color: var(--lp-orange-bright);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .siriso-lp-feature-cta:hover {
@@ -812,7 +916,9 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: border-color 0.25s ease, transform 0.25s ease;
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease;
 }
 
 .siriso-lp-arch-pod:hover {
@@ -960,8 +1066,8 @@
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.02em;
-  color: var(--p-zinc-950);
-  background: var(--p-amber-400);
+  color: var(--lp-bg-elevated);
+  background: var(--lp-promo);
 }
 
 .siriso-lp-plan-compare {
@@ -1002,7 +1108,8 @@
     var(--p-zinc-950) 100%
   );
   border: 1.5px solid var(--lp-border-orange);
-  box-shadow: 0 20px 50px color-mix(in srgb, var(--p-siriso-orange-500) 14%, transparent);
+  box-shadow: 0 20px 50px
+    color-mix(in srgb, var(--p-siriso-orange-500) 14%, transparent);
 }
 
 .siriso-lp-plan-price {
@@ -1206,7 +1313,9 @@
     padding: 0.45rem 0.55rem;
   }
 
-  .siriso-lp-nav-actions .siriso-lp-btn-outline-orange > span:not(.siriso-acct-mini),
+  .siriso-lp-nav-actions
+    .siriso-lp-btn-outline-orange
+    > span:not(.siriso-acct-mini),
   .siriso-lp-nav-actions .siriso-acct-pill > svg {
     display: none;
   }
@@ -1250,4 +1359,3 @@
     width: 100%;
   }
 }
-

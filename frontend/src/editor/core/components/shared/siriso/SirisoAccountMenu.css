@@ -152,7 +152,11 @@
 
 .siriso-acct-chip.is-ok {
   color: var(--c-success, var(--c-accent-text));
-  background: color-mix(in srgb, var(--c-success, var(--c-accent-solid)) 14%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--c-success, var(--c-accent-solid)) 14%,
+    transparent
+  );
 }
 
 .siriso-acct-chip.is-warn,

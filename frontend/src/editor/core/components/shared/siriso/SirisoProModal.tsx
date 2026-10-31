@@ -1,9 +1,9 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, type ReactNode, useEffect, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Icon } from "@editor/ui/Icon";
 import { useSirisoPro } from "@editor/contexts/SirisoProContext";
 import { getSirisoDesktopDownloadUrl } from "@editor/services/sirisoProService";
-import "./SirisoProModal.css";
+import "@editor/components/shared/siriso/SirisoProModal.css";
 
 function getInitials(name?: string, email?: string): string {
   const src = (name || email || "S").trim();
@@ -18,6 +18,190 @@ const ROLE_LABEL: Record<string, string> = {
   staff: "Tim Siriso",
   admin: "Admin",
 };
+
+function AccountCard({
+  name,
+  email,
+  nameFallback,
+  emailFallback,
+  pro = false,
+  badge,
+}: {
+  name?: string;
+  email?: string;
+  nameFallback: string;
+  emailFallback?: string;
+  pro?: boolean;
+  badge: ReactNode;
+}) {
+  return (
+    <div
+      className={`siriso-pm-user-card${pro ? " siriso-pm-user-card--pro" : ""}`}
+    >
+      <div className="siriso-pm-user-info">
+        <div className="siriso-pm-avatar">{getInitials(name, email)}</div>
+        <div>
+          <p className="siriso-pm-user-name">{name || nameFallback}</p>
+          <p className="siriso-pm-user-email">{email || emailFallback}</p>
+        </div>
+      </div>
+      {badge}
+    </div>
+  );
+}
+
+function AdFreeAccessNote({
+  isPro,
+  planName,
+  roleLabel,
+  expiresAt,
+}: {
+  isPro: boolean;
+  planName: string;
+  roleLabel?: string;
+  expiresAt?: string | null;
+}) {
+  return (
+    <p className="siriso-pm-panel-desc">
+      {isPro ? (
+        <>
+          Akun Anda sudah berstatus <strong>{planName}</strong>.
+        </>
+      ) : (
+        <>
+          Akun Anda ber-role <strong>{roleLabel}</strong> dari backoffice
+          Siriso, jadi seluruh fitur terbuka tanpa langganan.
+        </>
+      )}{" "}
+      Seluruh slot iklan di Workspace Web dinonaktifkan secara otomatis.
+      {isPro && expiresAt && (
+        <>
+          {" "}
+          Masa aktif berlaku hingga{" "}
+          <strong>
+            {new Date(expiresAt).toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </strong>
+          .
+        </>
+      )}
+    </p>
+  );
+}
+
+function DesktopCodeBox({
+  code,
+  copied,
+  onCopy,
+}: {
+  code: string;
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  return (
+    <div className="siriso-pm-code-box">
+      <code
+        className="siriso-pm-code-value"
+        data-testid="siriso-desktop-offline-code"
+      >
+        {code}
+      </code>
+      <button
+        type="button"
+        className="siriso-pm-btn siriso-pm-btn-secondary siriso-pm-btn-sm"
+        onClick={onCopy}
+      >
+        <Icon name="copy" size="0.9rem" />
+        <span>{copied ? "Tersalin!" : "Salin Kode"}</span>
+      </button>
+    </div>
+  );
+}
+
+function AdFreeAccountActions({
+  isChecking,
+  onEnterWorkspace,
+  onRefresh,
+  onLogout,
+}: {
+  isChecking: boolean;
+  onEnterWorkspace: () => void;
+  onRefresh: () => void;
+  onLogout: () => void;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: "0.6rem",
+      }}
+    >
+      <button
+        type="button"
+        className="siriso-pm-btn siriso-pm-btn-secondary siriso-pm-btn-sm"
+        onClick={onEnterWorkspace}
+        data-testid="siriso-modal-enter-workspace-btn"
+      >
+        <Icon name="layout-grid" size="0.9rem" />
+        <span>Buka Workspace PDF</span>
+      </button>
+      <div style={{ display: "flex", gap: "0.5rem" }}>
+        <button
+          type="button"
+          className="siriso-pm-btn siriso-pm-btn-secondary siriso-pm-btn-sm"
+          onClick={onRefresh}
+          disabled={isChecking}
+        >
+          <Icon name="refresh-cw" size="0.9rem" />
+          <span>Segarkan</span>
+        </button>
+        <button
+          type="button"
+          className="siriso-pm-btn siriso-pm-btn-secondary siriso-pm-btn-sm"
+          onClick={onLogout}
+          data-testid="siriso-logout-btn"
+        >
+          <Icon name="log-out" size="0.9rem" />
+          <span>Keluar Akun</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function WorkspaceLockedBanner({
+  planName,
+  formattedPrice,
+}: {
+  planName: string;
+  formattedPrice: string;
+}) {
+  return (
+    <div
+      className="siriso-pm-locked-banner"
+      data-testid="siriso-workspace-locked-banner"
+    >
+      <div className="siriso-pm-locked-banner-icon">
+        <Icon name="lock" size="1.05rem" />
+      </div>
+      <div className="siriso-pm-locked-banner-text">
+        <h4 className="siriso-pm-locked-banner-title">
+          Akses Workspace Terkunci — {planName} Diperlukan
+        </h4>
+        <p className="siriso-pm-locked-banner-desc">
+          Workspace dan seluruh fiturnya terbuka dengan{" "}
+          <strong>{planName} aktif</strong> ({formattedPrice}). Selesaikan
+          pembayaran QRIS di bawah ini untuk membuka akses seketika.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export function SirisoProModal() {
   const {
@@ -71,7 +255,13 @@ export function SirisoProModal() {
       ? activeQrisOrder.orderId
       : null;
   useEffect(() => {
-    if (!isProModalOpen || !isLoggedIn || (isAdFree && !showRenew) || !pollOrderId) return;
+    if (
+      !isProModalOpen ||
+      !isLoggedIn ||
+      (isAdFree && !showRenew) ||
+      !pollOrderId
+    )
+      return;
     const timer = window.setInterval(() => {
       void checkQrisPaymentStatus(pollOrderId);
     }, 5000);
@@ -228,17 +418,14 @@ export function SirisoProModal() {
         <div className="siriso-pm-panel siriso-pm-panel--highlight">
           <p className="siriso-pm-panel-title">
             <Icon name="star" size="1rem" />
-            <span>
-              Aktifkan Paket Pro via Payment Gateway QRIS
-            </span>
+            <span>Aktifkan Paket Pro via Payment Gateway QRIS</span>
           </p>
           <p className="siriso-pm-panel-desc">
-            Bayar instan menggunakan <strong>QRIS Resmi</strong>{" "}
-            (BCA Mobile, Livin&apos; Mandiri, BRImo, BNI, GoPay,
-            DANA, OVO, ShopeePay). Begitu pembayaran terverifikasi,
-            akun <strong>{proState.customerEmail}</strong> otomatis
-            bebas iklan di web dan membuka unduhan + kode offline
-            aplikasi Desktop.
+            Bayar instan menggunakan <strong>QRIS Resmi</strong> (BCA Mobile,
+            Livin&apos; Mandiri, BRImo, BNI, GoPay, DANA, OVO, ShopeePay).
+            Begitu pembayaran terverifikasi, akun{" "}
+            <strong>{proState.customerEmail}</strong> otomatis bebas iklan di
+            web dan membuka unduhan + kode offline aplikasi Desktop.
           </p>
           <button
             type="button"
@@ -298,9 +485,7 @@ export function SirisoProModal() {
                   />
                 </div>
               )}
-              <span className="siriso-pm-qris-nmid">
-                SATU QRIS UNTUK SEMUA
-              </span>
+              <span className="siriso-pm-qris-nmid">SATU QRIS UNTUK SEMUA</span>
             </div>
 
             <div className="siriso-pm-qris-details">
@@ -323,9 +508,7 @@ export function SirisoProModal() {
                     data-testid="siriso-qris-copy-btn"
                   >
                     <Icon name="copy" size="0.85rem" />
-                    <span>
-                      {copiedNominal ? "Tersalin!" : "Salin"}
-                    </span>
+                    <span>{copiedNominal ? "Tersalin!" : "Salin"}</span>
                   </button>
                 </div>
               </div>
@@ -348,9 +531,9 @@ export function SirisoProModal() {
                 >
                   <Icon name="refresh-cw" size="0.95rem" />
                   <span>
-                    <strong>Menunggu Verifikasi Mutasi QRIS</strong>{" "}
-                    — Pembayaran Anda sedang dicek otomatis. Status
-                    Pro akan aktif otomatis begitu mutasi masuk.
+                    <strong>Menunggu Verifikasi Mutasi QRIS</strong> —
+                    Pembayaran Anda sedang dicek otomatis. Status Pro akan aktif
+                    otomatis begitu mutasi masuk.
                   </span>
                 </div>
               ) : (
@@ -367,9 +550,7 @@ export function SirisoProModal() {
                     className="siriso-pm-input"
                     placeholder="Nama Pengirim / Bank / E-Wallet (mis. BCA - Budi)"
                     value={payerNote}
-                    onChange={(e) =>
-                      setPayerNote(e.currentTarget.value)
-                    }
+                    onChange={(e) => setPayerNote(e.currentTarget.value)}
                     disabled={isChecking}
                     data-testid="siriso-qris-payer-note"
                   />
@@ -451,9 +632,14 @@ export function SirisoProModal() {
                     <div className="siriso-pm-perk-icon">
                       <Icon
                         name={
-                          (["badge-check", "download", "sparkles", "log-in"] as const)[
-                            idx % 4
-                          ]
+                          (
+                            [
+                              "badge-check",
+                              "download",
+                              "sparkles",
+                              "log-in",
+                            ] as const
+                          )[idx % 4]
                         }
                         size="1.05rem"
                       />
@@ -641,73 +827,38 @@ export function SirisoProModal() {
                 </>
               ) : isAdFree ? (
                 <div className="siriso-pm-form">
-                  <div className="siriso-pm-user-card siriso-pm-user-card--pro">
-                    <div className="siriso-pm-user-info">
-                      <div className="siriso-pm-avatar">
-                        {getInitials(
-                          proState.customerName,
-                          proState.customerEmail,
-                        )}
-                      </div>
-                      <div>
-                        <p className="siriso-pm-user-name">
-                          {proState.customerName || "Pelanggan Siriso Pro"}
-                        </p>
-                        <p className="siriso-pm-user-email">
-                          {proState.customerEmail || "Akses Pro Terverifikasi"}
-                        </p>
-                      </div>
-                    </div>
-                    <span
-                      className="siriso-pm-status-badge siriso-pm-status-badge--pro"
-                      data-testid="siriso-account-status"
-                    >
-                      <Icon name="badge-check" size="0.85rem" />
-                      <span>
-                        {isPro
-                          ? `${pricing.name} Aktif`
-                          : `Akses Penuh · ${ROLE_LABEL[role] ?? "Tim"}`}
+                  <AccountCard
+                    pro
+                    name={proState.customerName}
+                    email={proState.customerEmail}
+                    nameFallback="Pelanggan Siriso Pro"
+                    emailFallback="Akses Pro Terverifikasi"
+                    badge={
+                      <span
+                        className="siriso-pm-status-badge siriso-pm-status-badge--pro"
+                        data-testid="siriso-account-status"
+                      >
+                        <Icon name="badge-check" size="0.85rem" />
+                        <span>
+                          {isPro
+                            ? `${pricing.name} Aktif`
+                            : `Akses Penuh · ${ROLE_LABEL[role] ?? "Tim"}`}
+                        </span>
                       </span>
-                    </span>
-                  </div>
+                    }
+                  />
 
                   <div className="siriso-pm-panel">
                     <p className="siriso-pm-panel-title">
                       <Icon name="sparkles" size="1rem" />
                       <span>Akses Web Bebas Iklan Aktif</span>
                     </p>
-                    <p className="siriso-pm-panel-desc">
-                      {isPro ? (
-                        <>
-                          Akun Anda sudah berstatus <strong>{pricing.name}</strong>.
-                        </>
-                      ) : (
-                        <>
-                          Akun Anda ber-role <strong>{ROLE_LABEL[role]}</strong>{" "}
-                          dari backoffice Siriso, jadi seluruh fitur terbuka tanpa
-                          langganan.
-                        </>
-                      )}{" "}
-                      Seluruh slot iklan di Workspace Web dinonaktifkan secara
-                      otomatis.
-                      {isPro && proState.expiresAt && (
-                        <>
-                          {" "}
-                          Masa aktif berlaku hingga{" "}
-                          <strong>
-                            {new Date(proState.expiresAt).toLocaleDateString(
-                              "id-ID",
-                              {
-                                day: "numeric",
-                                month: "long",
-                                year: "numeric",
-                              },
-                            )}
-                          </strong>
-                          .
-                        </>
-                      )}
-                    </p>
+                    <AdFreeAccessNote
+                      isPro={isPro}
+                      planName={pricing.name}
+                      roleLabel={ROLE_LABEL[role]}
+                      expiresAt={proState.expiresAt}
+                    />
                   </div>
 
                   <div className="siriso-pm-panel siriso-pm-panel--highlight">
@@ -725,22 +876,11 @@ export function SirisoProModal() {
                     </p>
 
                     {desktopCode && (
-                      <div className="siriso-pm-code-box">
-                        <code
-                          className="siriso-pm-code-value"
-                          data-testid="siriso-desktop-offline-code"
-                        >
-                          {desktopCode}
-                        </code>
-                        <button
-                          type="button"
-                          className="siriso-pm-btn siriso-pm-btn-secondary siriso-pm-btn-sm"
-                          onClick={handleCopyDesktopCode}
-                        >
-                          <Icon name="copy" size="0.9rem" />
-                          <span>{copiedCode ? "Tersalin!" : "Salin Kode"}</span>
-                        </button>
-                      </div>
+                      <DesktopCodeBox
+                        code={desktopCode}
+                        copied={copiedCode}
+                        onCopy={handleCopyDesktopCode}
+                      />
                     )}
 
                     <button
@@ -777,78 +917,35 @@ export function SirisoProModal() {
                       </button>
                     ))}
 
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      flexWrap: "wrap",
-                      gap: "0.6rem",
-                    }}
-                  >
-                    <button
-                      type="button"
-                      className="siriso-pm-btn siriso-pm-btn-secondary siriso-pm-btn-sm"
-                      onClick={() => enterWorkspace()}
-                      data-testid="siriso-modal-enter-workspace-btn"
-                    >
-                      <Icon name="layout-grid" size="0.9rem" />
-                      <span>Buka Workspace PDF</span>
-                    </button>
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
-                      <button
-                        type="button"
-                        className="siriso-pm-btn siriso-pm-btn-secondary siriso-pm-btn-sm"
-                        onClick={handleRefreshAccount}
-                        disabled={isChecking}
-                      >
-                        <Icon name="refresh-cw" size="0.9rem" />
-                        <span>Segarkan</span>
-                      </button>
-                      <button
-                        type="button"
-                        className="siriso-pm-btn siriso-pm-btn-secondary siriso-pm-btn-sm"
-                        onClick={handleLogout}
-                        data-testid="siriso-logout-btn"
-                      >
-                        <Icon name="log-out" size="0.9rem" />
-                        <span>Keluar Akun</span>
-                      </button>
-                    </div>
-                  </div>
+                  <AdFreeAccountActions
+                    isChecking={isChecking}
+                    onEnterWorkspace={() => enterWorkspace()}
+                    onRefresh={handleRefreshAccount}
+                    onLogout={handleLogout}
+                  />
                 </div>
               ) : (
                 <div className="siriso-pm-form">
-                  <div className="siriso-pm-user-card">
-                    <div className="siriso-pm-user-info">
-                      <div className="siriso-pm-avatar">
-                        {getInitials(
-                          proState.customerName,
-                          proState.customerEmail,
-                        )}
-                      </div>
-                      <div>
-                        <p className="siriso-pm-user-name">
-                          {proState.customerName || "Pengguna Siriso PDF"}
-                        </p>
-                        <p className="siriso-pm-user-email">
-                          {proState.customerEmail}
-                        </p>
-                      </div>
-                    </div>
-                    <span
-                      className={`siriso-pm-status-badge ${
-                        proState.proStatus === "pending"
-                          ? "siriso-pm-status-badge--pending"
-                          : "siriso-pm-status-badge--free"
-                      }`}
-                    >
-                      <span>
-                        {proState.proStatus === "pending"
-                          ? "Menunggu Konfirmasi"
-                          : "Belum Aktif (Perlu Bayar)"}
+                  <AccountCard
+                    name={proState.customerName}
+                    email={proState.customerEmail}
+                    nameFallback="Pengguna Siriso PDF"
+                    badge={
+                      <span
+                        className={`siriso-pm-status-badge ${
+                          proState.proStatus === "pending"
+                            ? "siriso-pm-status-badge--pending"
+                            : "siriso-pm-status-badge--free"
+                        }`}
+                      >
+                        <span>
+                          {proState.proStatus === "pending"
+                            ? "Menunggu Konfirmasi"
+                            : "Belum Aktif (Perlu Bayar)"}
+                        </span>
                       </span>
-                    </span>
-                  </div>
+                    }
+                  />
 
                   {canUseWorkspace ? (
                     <div className="siriso-pm-panel">
@@ -872,25 +969,10 @@ export function SirisoProModal() {
                       </button>
                     </div>
                   ) : (
-                    <div
-                      className="siriso-pm-locked-banner"
-                      data-testid="siriso-workspace-locked-banner"
-                    >
-                      <div className="siriso-pm-locked-banner-icon">
-                        <Icon name="lock" size="1.05rem" />
-                      </div>
-                      <div className="siriso-pm-locked-banner-text">
-                        <h4 className="siriso-pm-locked-banner-title">
-                          Akses Workspace Terkunci — {pricing.name} Diperlukan
-                        </h4>
-                        <p className="siriso-pm-locked-banner-desc">
-                          Workspace dan seluruh fiturnya terbuka dengan{" "}
-                          <strong>{pricing.name} aktif</strong> (
-                          {pricing.formattedPrice}). Selesaikan pembayaran QRIS
-                          di bawah ini untuk membuka akses seketika.
-                        </p>
-                      </div>
-                    </div>
+                    <WorkspaceLockedBanner
+                      planName={pricing.name}
+                      formattedPrice={pricing.formattedPrice}
+                    />
                   )}
 
                   {paymentSection}

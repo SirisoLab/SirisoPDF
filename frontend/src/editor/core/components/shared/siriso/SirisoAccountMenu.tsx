@@ -210,7 +210,9 @@ export function SirisoAccountMenu({
               <span className="siriso-acct-avatar-lg">{initials}</span>
               <div className="siriso-acct-id">
                 <b>{name}</b>
-                {proState.customerEmail && <span>{proState.customerEmail}</span>}
+                {proState.customerEmail && (
+                  <span>{proState.customerEmail}</span>
+                )}
               </div>
             </div>
             <div className="siriso-acct-chips">
@@ -224,11 +226,7 @@ export function SirisoAccountMenu({
               </span>
             </div>
             <div className="siriso-acct-items">
-              <button
-                type="button"
-                role="menuitem"
-                onClick={run(openProModal)}
-              >
+              <button type="button" role="menuitem" onClick={run(openProModal)}>
                 <Icon name="badge-check" size="1rem" />
                 <span>Akun &amp; langganan</span>
               </button>

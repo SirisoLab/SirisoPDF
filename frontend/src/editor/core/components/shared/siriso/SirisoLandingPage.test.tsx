@@ -15,8 +15,12 @@ const mocks = vi.hoisted(() => ({
   openLandingPage: vi.fn(),
   loginAccount: vi.fn().mockResolvedValue({ success: true, message: "OK" }),
   registerAccount: vi.fn().mockResolvedValue({ success: true, message: "OK" }),
-  requestProUpgrade: vi.fn().mockResolvedValue({ success: true, message: "OK" }),
-  createQrisPayment: vi.fn().mockResolvedValue({ success: true, message: "OK" }),
+  requestProUpgrade: vi
+    .fn()
+    .mockResolvedValue({ success: true, message: "OK" }),
+  createQrisPayment: vi
+    .fn()
+    .mockResolvedValue({ success: true, message: "OK" }),
   logoutAccount: vi.fn(),
   activateLicense: vi.fn().mockResolvedValue({ success: true, message: "OK" }),
   refreshStatus: vi.fn().mockResolvedValue(undefined),

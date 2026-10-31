@@ -1,6 +1,6 @@
 import { ChangeEvent, DragEvent, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Icon } from "@editor/ui/Icon";
+import { Icon, type IconName } from "@editor/ui/Icon";
 import { useSirisoPro } from "@editor/contexts/SirisoProContext";
 import { useSuppressQuickNavRail } from "@editor/contexts/QuickNavHostContext";
 import { useToolWorkflow } from "@editor/contexts/ToolWorkflowContext";
@@ -13,11 +13,108 @@ import {
   FEATURE_CATEGORIES,
   FeatureCategoryId,
   QUICK_LAUNCH_TOOLS,
+  type QuickLaunchTool,
   SIRISO_FEATURES,
+  type SirisoFeatureItem,
   WORKFLOW_STEPS,
 } from "@editor/components/shared/siriso/sirisoLandingData";
 import { SirisoAccountMenu } from "@editor/components/shared/siriso/SirisoAccountMenu";
 import "@editor/components/shared/siriso/SirisoLandingPage.css";
+
+function QuickLaunchButton({
+  tool,
+  onLaunch,
+}: {
+  tool: QuickLaunchTool;
+  onLaunch: (toolId: ToolId) => void;
+}) {
+  return (
+    <button
+      type="button"
+      className="siriso-lp-quick-btn"
+      onClick={() => onLaunch(tool.toolId)}
+    >
+      <span className="siriso-lp-quick-icon">
+        <Icon name={tool.icon} size="1.05rem" />
+      </span>
+      <span className="siriso-lp-quick-copy">
+        <span className="siriso-lp-quick-label">{tool.label}</span>
+        <span className="siriso-lp-quick-sub">{tool.sublabel}</span>
+      </span>
+      <Icon name="chevron-right" size="0.9rem" />
+    </button>
+  );
+}
+
+function FeatureCard({
+  feat,
+  onLaunch,
+}: {
+  feat: SirisoFeatureItem;
+  onLaunch: (toolId: ToolId) => void;
+}) {
+  return (
+    <article className="siriso-lp-feature-card">
+      <div>
+        <div className="siriso-lp-feature-top">
+          <div className="siriso-lp-feature-icon-box">
+            <Icon name={feat.icon} size="1.35rem" />
+          </div>
+          <div className="siriso-lp-feature-meta">
+            {feat.badge && (
+              <span className="siriso-lp-feature-badge">{feat.badge}</span>
+            )}
+            <span className="siriso-lp-feature-code">{feat.code}</span>
+          </div>
+        </div>
+
+        <div className="siriso-lp-feature-category">{feat.categoryLabel}</div>
+        <h3 className="siriso-lp-feature-title">{feat.title}</h3>
+        <div className="siriso-lp-feature-sub">{feat.subtitle}</div>
+        <p className="siriso-lp-feature-desc">{feat.description}</p>
+
+        <ul className="siriso-lp-feature-list">
+          {feat.highlights.map((pt) => (
+            <li key={pt} className="siriso-lp-feature-list-item">
+              <Icon name="circle-check" size="0.9rem" />
+              <span>{pt}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <button
+        type="button"
+        className="siriso-lp-feature-cta"
+        onClick={() => onLaunch(feat.toolId)}
+      >
+        <span>Gunakan Fitur Ini</span>
+        <Icon name="arrow-right" size="0.95rem" />
+      </button>
+    </article>
+  );
+}
+
+function PlanFeatureList({
+  features,
+  icon,
+  iconSize,
+}: {
+  features: string[];
+  icon: IconName;
+  iconSize: string;
+}) {
+  return (
+    <ul className="siriso-lp-plan-list">
+      {features.map((feature) => (
+        <li key={feature} className="siriso-lp-plan-item">
+          <Icon name={icon} size={iconSize} />
+          <span>{feature}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export function SirisoLandingPage() {
   useSuppressQuickNavRail(true);
@@ -315,7 +412,8 @@ export function SirisoLandingPage() {
                       Office &amp; OCR
                     </span>
                     <span className="siriso-lp-trust-label">
-                      Konversi Word, Excel, PPT, Gambar &amp; pengenalan teks scan
+                      Konversi Word, Excel, PPT, Gambar &amp; pengenalan teks
+                      scan
                     </span>
                   </div>
                   <div className="siriso-lp-trust-item">
@@ -387,25 +485,11 @@ export function SirisoLandingPage() {
 
                 <div className="siriso-lp-quick-grid">
                   {QUICK_LAUNCH_TOOLS.map((tool) => (
-                    <button
+                    <QuickLaunchButton
                       key={tool.id}
-                      type="button"
-                      className="siriso-lp-quick-btn"
-                      onClick={() => handleLaunchTool(tool.toolId)}
-                    >
-                      <span className="siriso-lp-quick-icon">
-                        <Icon name={tool.icon} size="1.05rem" />
-                      </span>
-                      <span className="siriso-lp-quick-copy">
-                        <span className="siriso-lp-quick-label">
-                          {tool.label}
-                        </span>
-                        <span className="siriso-lp-quick-sub">
-                          {tool.sublabel}
-                        </span>
-                      </span>
-                      <Icon name="chevron-right" size="0.9rem" />
-                    </button>
+                      tool={tool}
+                      onLaunch={handleLaunchTool}
+                    />
                   ))}
                 </div>
               </div>
@@ -478,50 +562,11 @@ export function SirisoLandingPage() {
 
             <div className="siriso-lp-features-grid">
               {filteredFeatures.map((feat) => (
-                <article key={feat.id} className="siriso-lp-feature-card">
-                  <div>
-                    <div className="siriso-lp-feature-top">
-                      <div className="siriso-lp-feature-icon-box">
-                        <Icon name={feat.icon} size="1.35rem" />
-                      </div>
-                      <div className="siriso-lp-feature-meta">
-                        {feat.badge && (
-                          <span className="siriso-lp-feature-badge">
-                            {feat.badge}
-                          </span>
-                        )}
-                        <span className="siriso-lp-feature-code">
-                          {feat.code}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="siriso-lp-feature-category">
-                      {feat.categoryLabel}
-                    </div>
-                    <h3 className="siriso-lp-feature-title">{feat.title}</h3>
-                    <div className="siriso-lp-feature-sub">{feat.subtitle}</div>
-                    <p className="siriso-lp-feature-desc">{feat.description}</p>
-
-                    <ul className="siriso-lp-feature-list">
-                      {feat.highlights.map((pt) => (
-                        <li key={pt} className="siriso-lp-feature-list-item">
-                          <Icon name="circle-check" size="0.9rem" />
-                          <span>{pt}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="siriso-lp-feature-cta"
-                    onClick={() => handleLaunchTool(feat.toolId)}
-                  >
-                    <span>Gunakan Fitur Ini</span>
-                    <Icon name="arrow-right" size="0.95rem" />
-                  </button>
-                </article>
+                <FeatureCard
+                  key={feat.id}
+                  feat={feat}
+                  onLaunch={handleLaunchTool}
+                />
               ))}
             </div>
           </div>
@@ -655,14 +700,11 @@ export function SirisoLandingPage() {
                     <p className="siriso-lp-feature-desc">
                       {pricing.free.description}
                     </p>
-                    <ul className="siriso-lp-plan-list">
-                      {pricing.free.features.map((feature) => (
-                        <li key={feature} className="siriso-lp-plan-item">
-                          <Icon name="check" size="1rem" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <PlanFeatureList
+                      features={pricing.free.features}
+                      icon="check"
+                      iconSize="1rem"
+                    />
                   </div>
 
                   <button
@@ -710,15 +752,14 @@ export function SirisoLandingPage() {
                   >
                     {pricing.formattedPrice}
                   </div>
-                  <p className="siriso-lp-feature-desc">{pricing.description}</p>
-                  <ul className="siriso-lp-plan-list">
-                    {pricing.features.map((feature) => (
-                      <li key={feature} className="siriso-lp-plan-item">
-                        <Icon name="badge-check" size="1.05rem" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <p className="siriso-lp-feature-desc">
+                    {pricing.description}
+                  </p>
+                  <PlanFeatureList
+                    features={pricing.features}
+                    icon="badge-check"
+                    iconSize="1.05rem"
+                  />
                 </div>
 
                 <div className="siriso-lp-plan-actions">
@@ -796,7 +837,9 @@ export function SirisoLandingPage() {
                   Buka Workspace Siriso PDF &amp; Olah Dokumen Anda Sekarang
                 </h3>
               </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
+              <div
+                style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem" }}
+              >
                 <button
                   type="button"
                   className="siriso-lp-btn siriso-lp-btn-primary siriso-lp-btn-lg"
@@ -900,7 +943,9 @@ export function SirisoLandingPage() {
             </div>
 
             <div>
-              <h4 className="siriso-lp-footer-col-title">Edit &amp; Keamanan</h4>
+              <h4 className="siriso-lp-footer-col-title">
+                Edit &amp; Keamanan
+              </h4>
               <ul className="siriso-lp-footer-links">
                 <li>
                   <button
@@ -997,4 +1042,3 @@ export function SirisoLandingPage() {
     </div>
   );
 }
-

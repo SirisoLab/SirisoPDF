@@ -499,7 +499,10 @@ export function SirisoProProvider({ children }: { children: ReactNode }) {
       if (document.visibilityState === "visible") void revalidate(true);
     };
     document.addEventListener("visibilitychange", onVisible);
-    const timer = window.setInterval(() => void revalidate(true), REVALIDATE_MS);
+    const timer = window.setInterval(
+      () => void revalidate(true),
+      REVALIDATE_MS,
+    );
     return () => {
       document.removeEventListener("visibilitychange", onVisible);
       window.clearInterval(timer);

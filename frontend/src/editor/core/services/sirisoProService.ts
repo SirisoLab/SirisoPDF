@@ -348,7 +348,9 @@ const asList = (v: unknown, fallback: string[]): string[] =>
     ? v.filter((x): x is string => typeof x === "string" && x.trim() !== "")
     : fallback;
 
-function normalizePricing(raw: Record<string, unknown> | undefined): SirisoPricing {
+function normalizePricing(
+  raw: Record<string, unknown> | undefined,
+): SirisoPricing {
   const p = raw || {};
   const d = DEFAULT_PRICING;
   const price = Number(p.price);
@@ -465,8 +467,7 @@ export function mapUserToProState(
     isPro: Boolean(user.isPro),
     authToken,
     userId: user.id,
-    role:
-      user.role === "staff" || user.role === "admin" ? user.role : "user",
+    role: user.role === "staff" || user.role === "admin" ? user.role : "user",
     proStatus: user.proStatus,
     customerName: user.name,
     customerEmail: user.email,
@@ -511,7 +512,10 @@ export async function fetchSirisoPublicConfig(): Promise<SirisoPublicConfig | nu
       workspaceRequiresPro: data.access?.workspaceRequiresPro !== false,
     };
     try {
-      localStorage.setItem(PUBLIC_CONFIG_KEY, JSON.stringify({ pricing, access }));
+      localStorage.setItem(
+        PUBLIC_CONFIG_KEY,
+        JSON.stringify({ pricing, access }),
+      );
     } catch {
       // storage is a convenience only
     }
@@ -697,7 +701,11 @@ export async function fetchSirisoAccountMe(token: string): Promise<{
         Authorization: `Bearer ${token}`,
       },
     });
-    if (response.status === 401 || response.status === 403 || response.status === 404) {
+    if (
+      response.status === 401 ||
+      response.status === 403 ||
+      response.status === 404
+    ) {
       return { success: false, invalid: true };
     }
     const data = await response.json();
