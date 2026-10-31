@@ -29,7 +29,8 @@ export function SirisoTopLeaderboardAd() {
         justifyContent: "center",
         padding: "6px 12px 10px",
         background: "var(--c-surface-1, #1a1b23)",
-        borderBottom: "1px solid var(--c-border-subtle, rgba(255,255,255,0.08))",
+        borderBottom:
+          "1px solid var(--c-border-subtle, rgba(255,255,255,0.08))",
         width: "100%",
         position: "relative",
       }}

@@ -500,7 +500,10 @@ export function SirisoProProvider({ children }: { children: ReactNode }) {
       if (document.visibilityState === "visible") void revalidate(true);
     };
     document.addEventListener("visibilitychange", onVisible);
-    const timer = window.setInterval(() => void revalidate(true), REVALIDATE_MS);
+    const timer = window.setInterval(
+      () => void revalidate(true),
+      REVALIDATE_MS,
+    );
     // The engine's paywall can know first that Pro lapsed or the session was revoked.
     const onEngineDenied = () => void revalidate(true);
     window.addEventListener(SIRISO_ACCESS_DENIED_EVENT, onEngineDenied);

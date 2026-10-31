@@ -148,7 +148,11 @@ export const SIRISO_FEATURES: SirisoFeatureItem[] = [
       "Satukan puluhan dokumen PDF menjadi satu bundel terstruktur atau pisahkan halaman tertentu berdasarkan rentang, penanda bab, maupun ukuran berkas tanpa mengubah tata letak asli.",
     icon: "merge",
     toolId: "merge",
-    highlights: ["Drag-and-drop urutan file", "Pemisahan per rentang halaman", "Pertahankan bookmark & daftar isi"],
+    highlights: [
+      "Drag-and-drop urutan file",
+      "Pemisahan per rentang halaman",
+      "Pertahankan bookmark & daftar isi",
+    ],
     badge: "POPULER",
   },
   {
@@ -162,7 +166,11 @@ export const SIRISO_FEATURES: SirisoFeatureItem[] = [
       "Konversi dua arah antara PDF dan format kerja harian: ubah PDF ke Word (.docx), Excel, PowerPoint, PNG/WEBP resolusi tinggi, HTML, Markdown, atau ubah dokumen Office menjadi PDF standar arsip.",
     icon: "file-convert",
     toolId: "convert",
-    highlights: ["PDF ke Word, Excel & PPT", "Word/Excel/PPT ke PDF", "Ekspor gambar DPI tinggi & PDF/A"],
+    highlights: [
+      "PDF ke Word, Excel & PPT",
+      "Word/Excel/PPT ke PDF",
+      "Ekspor gambar DPI tinggi & PDF/A",
+    ],
     badge: "UNGGULAN",
   },
   {
@@ -176,7 +184,11 @@ export const SIRISO_FEATURES: SirisoFeatureItem[] = [
       "Edit paragraf, perbaiki salah ketik, ganti tipografi, geser elemen gambar, dan tambahkan anotasi maupun penanda warna langsung di atas kanvas dokumen PDF Anda secara interaktif.",
     icon: "file-pen",
     toolId: "pdfTextEditor",
-    highlights: ["Ubah teks langsung di halaman", "Sisipkan gambar & bentuk", "Penggaris & panduan presisi"],
+    highlights: [
+      "Ubah teks langsung di halaman",
+      "Sisipkan gambar & bentuk",
+      "Penggaris & panduan presisi",
+    ],
     badge: "KANVAS",
   },
   {
@@ -190,7 +202,11 @@ export const SIRISO_FEATURES: SirisoFeatureItem[] = [
       "Perkecil ukuran file PDF secara drastis untuk lampiran email atau portal unggahan tanpa mengaburkan ketajaman huruf, serta kenali teks dari hasil scan menggunakan mesin OCR akurat.",
     icon: "shrink",
     toolId: "compress",
-    highlights: ["Rasio kompresi terukur", "OCR dokumen hasil pindaian", "Perbaikan PDF rusak (Repair)"],
+    highlights: [
+      "Rasio kompresi terukur",
+      "OCR dokumen hasil pindaian",
+      "Perbaikan PDF rusak (Repair)",
+    ],
   },
   {
     id: "feat-signature",
@@ -203,7 +219,11 @@ export const SIRISO_FEATURES: SirisoFeatureItem[] = [
       "Bubuhkan tanda tangan goresan tangan, unggah spesimen tanda tangan, atau tandatangani dokumen secara kriptografis menggunakan sertifikat PKCS#12 (.p12/.pfx) lengkap dengan fitur verifikasi keaslian.",
     icon: "signature",
     toolId: "sign",
-    highlights: ["Goresan langsung atau QR HP", "Sertifikat digital .p12 / .pfx", "Validasi tanda tangan resmi"],
+    highlights: [
+      "Goresan langsung atau QR HP",
+      "Sertifikat digital .p12 / .pfx",
+      "Validasi tanda tangan resmi",
+    ],
     badge: "KRIPTOGRAFI",
   },
   {
@@ -217,7 +237,11 @@ export const SIRISO_FEATURES: SirisoFeatureItem[] = [
       "Kunci dokumen rahasia dengan enkripsi kata sandi, atur izin cetak/salin, hapus metadata tersembunyi, atau sensor permanen (Redaction) data pribadi hingga tidak dapat dipulihkan.",
     icon: "shield-check",
     toolId: "redact",
-    highlights: ["Enkripsi & buka kunci sandi", "Redaksi permanen teks sensitif", "Pembersihan metadata & skrip"],
+    highlights: [
+      "Enkripsi & buka kunci sandi",
+      "Redaksi permanen teks sensitif",
+      "Pembersihan metadata & skrip",
+    ],
   },
   {
     id: "feat-multitool",
@@ -230,7 +254,11 @@ export const SIRISO_FEATURES: SirisoFeatureItem[] = [
       "Kelola ratusan halaman sekaligus dalam tampilan kisi visual: putar halaman, sisipkan dokumen lain di tengah halaman, gandakan, pisahkan, atau hapus halaman kosong dalam satu layar.",
     icon: "layout-grid",
     toolId: "multiTool",
-    highlights: ["Pratinjau thumbnail instan", "Putar & susun ulang massal", "Hapus halaman kosong otomatis"],
+    highlights: [
+      "Pratinjau thumbnail instan",
+      "Putar & susun ulang massal",
+      "Hapus halaman kosong otomatis",
+    ],
   },
   {
     id: "feat-forms",
@@ -243,7 +271,11 @@ export const SIRISO_FEATURES: SirisoFeatureItem[] = [
       "Isi kolom formulir PDF interaktif dengan cepat, deteksi area isian secara otomatis pada formulir datar, atau kunci formulir (Flatten) agar isian tidak dapat diubah kembali oleh penerima.",
     icon: "form-input",
     toolId: "formFill",
-    highlights: ["Deteksi kolom formulir", "Isian teks, kotak centang & tanggal", "Flatten formulir menjadi permanen"],
+    highlights: [
+      "Deteksi kolom formulir",
+      "Isian teks, kotak centang & tanggal",
+      "Flatten formulir menjadi permanen",
+    ],
   },
   {
     id: "feat-watermark-stamp",
@@ -256,7 +288,11 @@ export const SIRISO_FEATURES: SirisoFeatureItem[] = [
       "Lindungi hak cipta dokumen perusahaan dengan watermark teks atau logo transparan, tambahkan stempel persetujuan di posisi presisi, dan beri penomoran halaman otomatis.",
     icon: "watermark",
     toolId: "watermark",
-    highlights: ["Watermark teks & gambar logo", "Pengaturan opasitas & rotasi", "Penomoran halaman kustom"],
+    highlights: [
+      "Watermark teks & gambar logo",
+      "Pengaturan opasitas & rotasi",
+      "Penomoran halaman kustom",
+    ],
   },
   {
     id: "feat-compare",
@@ -269,7 +305,11 @@ export const SIRISO_FEATURES: SirisoFeatureItem[] = [
       "Temukan setiap perubahan antara dua versi kontrak atau laporan secara berdampingan. Sorot perbedaan teks maupun perubahan visual piksel demi akurasi audit dokumen.",
     icon: "image-compare",
     toolId: "compare",
-    highlights: ["Perbandingan teks & piksel", "Sorotan perubahan warna", "Navigasi antar titik revisi"],
+    highlights: [
+      "Perbandingan teks & piksel",
+      "Sorotan perubahan warna",
+      "Navigasi antar titik revisi",
+    ],
   },
   {
     id: "feat-layout-booklet",
@@ -282,7 +322,11 @@ export const SIRISO_FEATURES: SirisoFeatureItem[] = [
       "Susun beberapa halaman PDF ke dalam satu lembar cetak (N-up), potong margin berlebih secara presisi, ubah skala ukuran kertas (A4, Letter, Legal), atau buat susunan cetak buklet.",
     icon: "crop",
     toolId: "crop",
-    highlights: ["Potong margin (Crop) visual", "Cetak N-up & buklet lipat", "Penyesuaian skala ukuran kertas"],
+    highlights: [
+      "Potong margin (Crop) visual",
+      "Cetak N-up & buklet lipat",
+      "Penyesuaian skala ukuran kertas",
+    ],
   },
   {
     id: "feat-automate",
@@ -295,7 +339,11 @@ export const SIRISO_FEATURES: SirisoFeatureItem[] = [
       "Rangkai beberapa operasi PDF menjadi satu alur kerja otomatis yang dapat disimpan dan dijalankan berulang kali—misalnya: OCR Scan → Kompres Ukuran → Tambah Watermark → Kunci Sandi.",
     icon: "workflow",
     toolId: "automate",
-    highlights: ["Rangkaian operasi tanpa batas", "Simpan preset alur kerja", "Pemrosesan batch banyak file"],
+    highlights: [
+      "Rangkaian operasi tanpa batas",
+      "Simpan preset alur kerja",
+      "Pemrosesan batch banyak file",
+    ],
     badge: "PIPELINE",
   },
 ];
@@ -434,9 +482,9 @@ export const SIRISO_FAQS: SirisoFaqItem[] = [
   },
   {
     num: "06",
-    question: "Bisakah saya mengolah beberapa tahap sekaligus tanpa upload ulang?",
+    question:
+      "Bisakah saya mengolah beberapa tahap sekaligus tanpa upload ulang?",
     answer:
       "Bisa. Arsitektur Stateful Multi-Tool di Siriso PDF menyimpan dokumen aktif di sesi meja kerja Anda. Setelah selesai memotong atau menggabungkan halaman, Anda cukup memilih alat berikutnya (misalnya Kompres atau Tanda Tangan) dan file hasil sebelumnya langsung siap diproses.",
   },
 ];
-
