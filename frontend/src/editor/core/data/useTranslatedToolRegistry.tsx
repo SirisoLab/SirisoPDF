@@ -2,6 +2,7 @@ import { lazy, useMemo } from "react";
 import { Icon } from "@editor/ui/Icon";
 import { useTranslation } from "react-i18next";
 import { devApiLink } from "@editor/constants/links";
+import { useSirisoPro } from "@editor/contexts/SirisoProContext";
 import { reorganizePagesOperationConfig } from "@editor/hooks/tools/reorganizePages/useReorganizePagesOperation";
 import {
   SubcategoryId,
@@ -77,6 +78,7 @@ export interface TranslatedToolCatalog {
 export function useTranslatedToolCatalog(): TranslatedToolCatalog {
   const { t } = useTranslation();
   const proprietaryTools = useProprietaryToolRegistry();
+  const { isAdmin } = useSirisoPro();
 
   return useMemo(() => {
     const allTools: ToolRegistry = {
@@ -1050,6 +1052,8 @@ export function useTranslatedToolCatalog(): TranslatedToolCatalog {
         description: t("home.devApi.desc", "Link to API documentation"),
         categoryId: ToolCategoryId.ADVANCED_TOOLS,
         subcategoryId: SubcategoryId.DEVELOPER_TOOLS,
+        // Links into developer documentation: Siriso admins only
+        hiddenFromToolList: !isAdmin,
         link: devApiLink,
         endpoints: ["dev-api-docs"],
         synonyms: getSynonyms(t, "devApi"),
@@ -1072,6 +1076,8 @@ export function useTranslatedToolCatalog(): TranslatedToolCatalog {
         ),
         categoryId: ToolCategoryId.ADVANCED_TOOLS,
         subcategoryId: SubcategoryId.DEVELOPER_TOOLS,
+        // Links into developer documentation: Siriso admins only
+        hiddenFromToolList: !isAdmin,
         link: "https://docs.stirlingpdf.com/Configuration/Folder%20Scanning/",
         endpoints: ["dev-folder-scanning-docs"],
         synonyms: getSynonyms(t, "devFolderScanning"),
@@ -1091,6 +1097,8 @@ export function useTranslatedToolCatalog(): TranslatedToolCatalog {
         description: t("home.devSsoGuide.desc", "Link to SSO guide"),
         categoryId: ToolCategoryId.ADVANCED_TOOLS,
         subcategoryId: SubcategoryId.DEVELOPER_TOOLS,
+        // Links into developer documentation: Siriso admins only
+        hiddenFromToolList: !isAdmin,
         link: "https://docs.stirlingpdf.com/Configuration/Single%20Sign-On%20Configuration/",
         endpoints: ["dev-sso-guide-docs"],
         synonyms: getSynonyms(t, "devSsoGuide"),
@@ -1113,6 +1121,8 @@ export function useTranslatedToolCatalog(): TranslatedToolCatalog {
         ),
         categoryId: ToolCategoryId.ADVANCED_TOOLS,
         subcategoryId: SubcategoryId.DEVELOPER_TOOLS,
+        // Links into developer documentation: Siriso admins only
+        hiddenFromToolList: !isAdmin,
         link: "https://docs.stirlingpdf.com/Paid-Offerings/#activating-your-license",
         endpoints: ["dev-airgapped-docs"],
         synonyms: getSynonyms(t, "devAirgapped"),
@@ -1272,5 +1282,5 @@ export function useTranslatedToolCatalog(): TranslatedToolCatalog {
       superTools,
       linkTools,
     };
-  }, [t, proprietaryTools]);
+  }, [t, proprietaryTools, isAdmin]);
 }

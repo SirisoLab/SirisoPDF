@@ -1,5 +1,9 @@
 import type { IconName } from "@editor/ui/Icon";
 import type { ToolId } from "@editor/types/toolId";
+import type {
+  SirisoAccessPolicy,
+  SirisoPricing,
+} from "@editor/services/sirisoProService";
 
 export type FeatureCategoryId =
   | "all"
@@ -369,6 +373,34 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
   },
 ];
 
+/**
+ * FAQ answers that depend on the backoffice (price, free access) are built from the live
+ * pricing and access policy so the landing page never contradicts the checkout.
+ */
+export function buildSirisoFaqs(
+  pricing: SirisoPricing,
+  policy: SirisoAccessPolicy,
+): SirisoFaqItem[] {
+  return SIRISO_FAQS.map((item) => {
+    if (item.num === "02") {
+      return {
+        ...item,
+        answer: policy.workspaceRequiresPro
+          ? `Anda bisa menjelajahi informasi fitur dan membuat akun secara gratis. Untuk membuka Workspace PDF dan seluruh alatnya diperlukan ${pricing.name} aktif (${pricing.formattedPrice}), yang bisa dibayar instan lewat QRIS.`
+          : `Ya. Cukup buat akun gratis untuk membuka Workspace PDF di browser. Versi gratis didukung tayangan iklan resmi Google AdSense; ${pricing.name} (${pricing.formattedPrice}) menghilangkan iklan dan membuka aplikasi desktop.`,
+      };
+    }
+    if (item.num === "03") {
+      return {
+        ...item,
+        question: `Apa saja keuntungan berlangganan Siriso PDF ${pricing.name} (${pricing.formattedPrice})?`,
+        answer: `Dengan ${pricing.name} seharga ${pricing.formattedPrice}, Anda mendapatkan: ${pricing.features.join("; ")}. Masa aktif ${pricing.planDays} hari dan dapat diperpanjang kapan saja tanpa kehilangan sisa hari.`,
+      };
+    }
+    return item;
+  });
+}
+
 export const SIRISO_FAQS: SirisoFaqItem[] = [
   {
     num: "01",
@@ -380,13 +412,13 @@ export const SIRISO_FAQS: SirisoFaqItem[] = [
     num: "02",
     question: "Apakah Siriso PDF bisa digunakan secara gratis di web?",
     answer:
-      "Ya. Anda dapat langsung menggunakan alat-alat PDF di versi web secara gratis tanpa dipaksa membuat akun terlebih dahulu. Versi gratis didukung oleh tayangan iklan ringan agar layanan tetap dapat diakses oleh semua pengguna.",
+      "Anda bisa membuat akun Siriso PDF secara gratis. Akses Workspace mengikuti paket yang berlaku.",
   },
   {
     num: "03",
-    question: "Apa saja keuntungan berlangganan Siriso PDF Paket Pro (Rp 25.000 / bulan)?",
+    question: "Apa saja keuntungan berlangganan Siriso PDF Paket Pro?",
     answer:
-      "Dengan Paket Pro seharga Rp 25.000 per bulan, seluruh iklan di antarmuka web otomatis dihilangkan (100% Bebas Iklan), Anda mendapatkan akses penuh ke seluruh fitur konversi & otomatisasi, serta hak unduh eksklusif aplikasi Siriso PDF Desktop untuk Windows (x64) yang dapat dijalankan secara offline.",
+      "Paket Pro menghilangkan seluruh iklan, membuka akses penuh fitur konversi & otomatisasi, dan memberi hak unduh aplikasi Siriso PDF Desktop untuk Windows (x64) yang bisa berjalan offline.",
   },
   {
     num: "04",

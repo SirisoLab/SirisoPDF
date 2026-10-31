@@ -16,11 +16,11 @@ const DocsPage = lazy(() => import("@editor/components/docs/DocsPage"));
 
 function AppContent() {
   const { pathname } = useLocation();
-  const { isLandingOpen, isPro } = useSirisoPro();
+  const { isLandingOpen, canUseWorkspace, isAdmin } = useSirisoPro();
   const path = stripBasePath(pathname);
   const isTestMode = import.meta.env.MODE === "test";
 
-  if (!isTestMode && !isPro) {
+  if (!isTestMode && !canUseWorkspace) {
     return <SirisoLandingPage />;
   }
 
@@ -32,7 +32,8 @@ function AppContent() {
     );
   }
 
-  if (HAS_DOCS && path.startsWith(DOCS_PATH)) {
+  // Developer documentation is for Siriso admins only; everyone else falls through to the editor.
+  if (HAS_DOCS && isAdmin && path.startsWith(DOCS_PATH)) {
     return (
       <Suspense fallback={<LoadingFallback />}>
         <DocsPage />

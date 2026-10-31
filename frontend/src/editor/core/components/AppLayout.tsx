@@ -22,12 +22,12 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   const { banner } = useBanner();
   const { pathname } = useLocation();
-  const { isLandingOpen, isPro } = useSirisoPro();
+  const { isLandingOpen, canUseWorkspace } = useSirisoPro();
   const path = stripBasePath(pathname);
   const isTestMode = import.meta.env.MODE === "test";
   const showingLanding =
     path === "/welcome" ||
-    (!isTestMode && !isPro) ||
+    (!isTestMode && !canUseWorkspace) ||
     (isLandingOpen && (path === "/" || path === ""));
 
   return (

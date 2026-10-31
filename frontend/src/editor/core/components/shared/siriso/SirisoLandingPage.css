@@ -938,6 +938,53 @@
   align-items: stretch;
 }
 
+/* Pro-only access: one centred plan instead of a free/pro comparison */
+.siriso-lp-pricing-grid--single {
+  grid-template-columns: minmax(0, 40rem);
+  justify-content: center;
+}
+
+.siriso-lp-plan-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.siriso-lp-plan-promo {
+  display: inline-block;
+  margin-top: 0.85rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--p-zinc-950);
+  background: var(--p-amber-400);
+}
+
+.siriso-lp-plan-compare {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: var(--lp-text-muted);
+  text-decoration: line-through;
+}
+
+.siriso-lp-plan-compare + .siriso-lp-plan-price {
+  margin-top: 0.1rem;
+}
+
+.siriso-lp-plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.siriso-lp-plan-actions > .siriso-lp-btn {
+  flex: 1;
+}
+
 .siriso-lp-plan-card {
   padding: 2rem;
   border-radius: 1.25rem;
@@ -1150,8 +1197,17 @@
 
   .siriso-lp-nav-links,
   .siriso-lp-lab-link,
-  .siriso-lp-brand-badge,
+  .siriso-lp-nav .siriso-lp-brand-badge {
+    display: none;
+  }
+
+  /* Sign-in and the account menu stay reachable on phones, as compact icons. */
   .siriso-lp-nav-actions .siriso-lp-btn-outline-orange {
+    padding: 0.45rem 0.55rem;
+  }
+
+  .siriso-lp-nav-actions .siriso-lp-btn-outline-orange > span:not(.siriso-acct-mini),
+  .siriso-lp-nav-actions .siriso-acct-pill > svg {
     display: none;
   }
 

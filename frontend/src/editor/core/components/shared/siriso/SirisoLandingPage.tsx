@@ -9,20 +9,34 @@ import type { ToolId } from "@editor/types/toolId";
 import sirisoLogoUrl from "@editor/assets/brand/modern-logo/SirisoLogo.png";
 import {
   ARCHITECTURE_PODS,
+  buildSirisoFaqs,
   FEATURE_CATEGORIES,
   FeatureCategoryId,
   QUICK_LAUNCH_TOOLS,
-  SIRISO_FAQS,
   SIRISO_FEATURES,
   WORKFLOW_STEPS,
 } from "@editor/components/shared/siriso/sirisoLandingData";
+import { SirisoAccountMenu } from "@editor/components/shared/siriso/SirisoAccountMenu";
 import "@editor/components/shared/siriso/SirisoLandingPage.css";
 
 export function SirisoLandingPage() {
   useSuppressQuickNavRail(true);
 
-  const { isPro, isLoggedIn, proState, adsConfig, openProModal, enterWorkspace } =
-    useSirisoPro();
+  const {
+    isPro,
+    isLoggedIn,
+    isAdFree,
+    canUseWorkspace,
+    pricing,
+    accessPolicy,
+    openProModal,
+    enterWorkspace,
+  } = useSirisoPro();
+  const showFreePlan = !accessPolicy.workspaceRequiresPro;
+  const faqs = useMemo(
+    () => buildSirisoFaqs(pricing, accessPolicy),
+    [pricing, accessPolicy],
+  );
   const { handleToolSelect, setReaderMode } = useToolWorkflow();
   const { actions: fileActions } = useFileActions();
   const navigate = useNavigate();
@@ -61,7 +75,7 @@ export function SirisoLandingPage() {
   };
 
   const handlePickFilesClick = () => {
-    if (!isLoggedIn) {
+    if (!canUseWorkspace) {
       enterWorkspace(() => {
         fileInputRef.current?.click();
       });
@@ -203,24 +217,19 @@ export function SirisoLandingPage() {
               <Icon name="move-up-right" size="0.8rem" />
             </a>
 
-            <button
-              type="button"
-              className="siriso-lp-btn siriso-lp-btn-outline-orange"
-              onClick={openProModal}
-              data-testid="landing-open-pro-modal"
-            >
-              <Icon
-                name={isPro ? "badge-check" : isLoggedIn ? "user" : "log-in"}
-                size="0.95rem"
-              />
-              <span>
-                {isPro
-                  ? "Akun Pro Aktif"
-                  : isLoggedIn
-                    ? proState.customerName || "Akun Saya"
-                    : "Masuk / Paket Pro"}
-              </span>
-            </button>
+            {isLoggedIn ? (
+              <SirisoAccountMenu variant="landing" />
+            ) : (
+              <button
+                type="button"
+                className="siriso-lp-btn siriso-lp-btn-outline-orange"
+                onClick={openProModal}
+                data-testid="landing-open-pro-modal"
+              >
+                <Icon name="log-in" size="0.95rem" />
+                <span>Masuk / Paket Pro</span>
+              </button>
+            )}
 
             <button
               type="button"
@@ -605,153 +614,130 @@ export function SirisoLandingPage() {
               <div>
                 <div className="siriso-lp-section-label">
                   <span className="siriso-lp-section-index">(04)</span>
-                  <span>EDISI WEB GRATIS &amp; PAKET PRO DESKTOP</span>
+                  <span>
+                    {showFreePlan
+                      ? "EDISI WEB GRATIS & PAKET PRO DESKTOP"
+                      : "PAKET LANGGANAN SIRISO PDF"}
+                  </span>
                 </div>
                 <h2 className="siriso-lp-section-title">
-                  Pilih Pengalaman Kerja Sesuai Kebutuhan Anda
+                  {showFreePlan
+                    ? "Pilih Pengalaman Kerja Sesuai Kebutuhan Anda"
+                    : `Satu Paket untuk Seluruh Workspace — ${pricing.name}`}
                 </h2>
               </div>
               <p className="siriso-lp-section-subtitle">
-                Gunakan langsung di web secara gratis, atau tingkatkan ke Paket
-                Pro untuk pengalaman bebas iklan dan aplikasi Desktop Windows
-                offline.
+                {showFreePlan
+                  ? `Mulai gratis dengan akun Siriso, atau pilih ${pricing.name} untuk pengalaman bebas iklan dan aplikasi Desktop Windows offline.`
+                  : `Workspace PDF dan seluruh alatnya terbuka dengan ${pricing.name} aktif. Bayar instan via QRIS, aktif ${pricing.planDays} hari.`}
               </p>
             </div>
 
-            <div className="siriso-lp-pricing-grid">
-              <div className="siriso-lp-plan-card">
-                <div>
-                  <span className="siriso-lp-brand-badge">AKSES WEB STANDAR</span>
-                  <div className="siriso-lp-plan-price">
-                    Gratis{" "}
-                    <span className="siriso-lp-plan-period">
-                      / Selamanya di Browser
-                    </span>
-                  </div>
-                  <p className="siriso-lp-feature-desc">
-                    Cocok untuk kebutuhan pengolahan dokumen PDF harian langsung
-                    dari peramban tanpa instalasi.
-                  </p>
-                  <ul className="siriso-lp-plan-list">
-                    <li className="siriso-lp-plan-item">
-                      <Icon name="check" size="1rem" />
-                      <span>
-                        Akses ke alat-alat PDF utama (Gabung, Pisah, Kompres,
-                        Putar, Baca &amp; Anotasi)
-                      </span>
-                    </li>
-                    <li className="siriso-lp-plan-item">
-                      <Icon name="check" size="1rem" />
-                      <span>
-                        Alur kerja Multi-Tool berantai langsung di memori
-                        peramban
-                      </span>
-                    </li>
-                    <li className="siriso-lp-plan-item">
-                      <Icon name="check" size="1rem" />
-                      <span>
-                        Cukup daftar akun gratis Siriso PDF untuk membuka akses
-                        penuh ke Workspace Web
-                      </span>
-                    </li>
-                    <li className="siriso-lp-plan-item">
-                      <Icon name="info" size="1rem" />
-                      <span>
-                        Hanya menampilkan iklan resmi Google AdSense (tanpa
-                        banner placeholder pihak ketiga)
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-
-                <button
-                  type="button"
-                  className="siriso-lp-btn siriso-lp-btn-secondary siriso-lp-btn-lg"
-                  onClick={handleOpenWorkspace}
-                >
-                  <span>Mulai Gunakan Versi Web Gratis</span>
-                  <Icon name="arrow-right" size="1rem" />
-                </button>
-              </div>
-
-              <div className="siriso-lp-plan-card siriso-lp-plan-card--pro">
-                <div>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                    }}
-                  >
-                    <span className="siriso-lp-brand-badge">
-                      SIRISO PDF PAKET PRO
-                    </span>
-                    <span className="siriso-lp-feature-code">
-                      BEBAS IKLAN + DESKTOP WINDOWS
-                    </span>
-                  </div>
-                  <div className="siriso-lp-plan-price">
-                    {adsConfig.priceFormatted || "Rp 25.000 / bulan"}
-                  </div>
-                  <p className="siriso-lp-feature-desc">
-                    Solusi profesional tanpa gangguan iklan di web sekaligus
-                    akses unduhan installer aplikasi Siriso PDF Desktop Windows
-                    (x64).
-                  </p>
-                  <ul className="siriso-lp-plan-list">
-                    <li className="siriso-lp-plan-item">
-                      <Icon name="badge-check" size="1.05rem" />
-                      <span>
-                        <strong>100% Bebas Iklan</strong> di seluruh antarmuka
-                        web dan meja kerja PDF
-                      </span>
-                    </li>
-                    <li className="siriso-lp-plan-item">
-                      <Icon name="download" size="1.05rem" />
-                      <span>
-                        <strong>
-                          Unduh Siriso PDF Desktop (Windows x64)
-                        </strong>{" "}
-                        untuk pemrosesan lokal &amp; offline tanpa batas
-                      </span>
-                    </li>
-                    <li className="siriso-lp-plan-item">
-                      <Icon name="sparkles" size="1.05rem" />
-                      <span>
-                        <strong>Kapabilitas Penuh</strong>: Siriso Office
-                        Convert, OCR multi-bahasa, tanda tangan sertifikat &amp;
-                        pipeline otomatisasi
-                      </span>
-                    </li>
-                    <li className="siriso-lp-plan-item">
-                      <Icon name="log-in" size="1.05rem" />
-                      <span>
-                        <strong>Login Akun Otomatis di Web</strong> + Kode
-                        Aktivasi khusus untuk mode offline Aplikasi Desktop
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-
+            <div
+              className={`siriso-lp-pricing-grid${showFreePlan ? "" : " siriso-lp-pricing-grid--single"}`}
+              data-testid="landing-pricing"
+            >
+              {showFreePlan && (
                 <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "0.75rem",
-                  }}
+                  className="siriso-lp-plan-card"
+                  data-testid="landing-free-plan"
                 >
+                  <div>
+                    <span className="siriso-lp-brand-badge">
+                      {pricing.free.name}
+                    </span>
+                    <div className="siriso-lp-plan-price">
+                      {pricing.free.priceLabel}{" "}
+                      <span className="siriso-lp-plan-period">
+                        {pricing.free.periodLabel}
+                      </span>
+                    </div>
+                    <p className="siriso-lp-feature-desc">
+                      {pricing.free.description}
+                    </p>
+                    <ul className="siriso-lp-plan-list">
+                      {pricing.free.features.map((feature) => (
+                        <li key={feature} className="siriso-lp-plan-item">
+                          <Icon name="check" size="1rem" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="siriso-lp-btn siriso-lp-btn-secondary siriso-lp-btn-lg"
+                    onClick={handleOpenWorkspace}
+                  >
+                    <span>{pricing.free.ctaLabel}</span>
+                    <Icon name="arrow-right" size="1rem" />
+                  </button>
+                </div>
+              )}
+
+              <div
+                className="siriso-lp-plan-card siriso-lp-plan-card--pro"
+                data-testid="landing-pro-plan"
+              >
+                <div>
+                  <div className="siriso-lp-plan-top">
+                    <span className="siriso-lp-brand-badge">
+                      {pricing.badge}
+                    </span>
+                    {pricing.tagline && (
+                      <span className="siriso-lp-feature-code">
+                        {pricing.tagline}
+                      </span>
+                    )}
+                  </div>
+                  {pricing.promoLabel && (
+                    <span className="siriso-lp-plan-promo">
+                      {pricing.promoLabel}
+                    </span>
+                  )}
+                  {pricing.compareAtPrice > pricing.price && (
+                    <div
+                      className="siriso-lp-plan-compare"
+                      data-testid="landing-pro-compare"
+                    >
+                      {pricing.formattedCompareAt}
+                    </div>
+                  )}
+                  <div
+                    className="siriso-lp-plan-price"
+                    data-testid="landing-pro-price"
+                  >
+                    {pricing.formattedPrice}
+                  </div>
+                  <p className="siriso-lp-feature-desc">{pricing.description}</p>
+                  <ul className="siriso-lp-plan-list">
+                    {pricing.features.map((feature) => (
+                      <li key={feature} className="siriso-lp-plan-item">
+                        <Icon name="badge-check" size="1.05rem" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="siriso-lp-plan-actions">
                   <button
                     type="button"
                     className="siriso-lp-btn siriso-lp-btn-primary siriso-lp-btn-lg"
-                    style={{ flex: 1 }}
                     onClick={openProModal}
+                    data-testid="landing-pro-cta"
                   >
-                    <Icon name={isPro ? "badge-check" : "log-in"} size="1.05rem" />
+                    <Icon
+                      name={isAdFree ? "badge-check" : "star"}
+                      size="1.05rem"
+                    />
                     <span>
                       {isPro
-                        ? "Akun Pro & Unduh Aplikasi Desktop"
-                        : "Masuk Akun / Upgrade Paket Pro"}
+                        ? "Kelola Langganan & Unduh Desktop"
+                        : isAdFree
+                          ? "Akun & Unduh Aplikasi Desktop"
+                          : pricing.ctaLabel}
                     </span>
                   </button>
                 </div>
@@ -779,7 +765,7 @@ export function SirisoLandingPage() {
             </div>
 
             <div className="siriso-lp-faq-list">
-              {SIRISO_FAQS.map((faq, idx) => (
+              {faqs.map((faq, idx) => (
                 <details
                   key={faq.num}
                   className="siriso-lp-faq-item"

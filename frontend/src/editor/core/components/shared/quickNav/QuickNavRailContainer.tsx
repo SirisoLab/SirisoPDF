@@ -11,6 +11,8 @@ import {
 import { QuickNavRailAccount } from "@editor/components/shared/quickNav/QuickNavRailAccount";
 import { QuickNavRailNotifications } from "@editor/components/shared/quickNav/QuickNavRailNotifications";
 import { QuickNavRailFooterExtensions } from "@editor/components/shared/quickNav/QuickNavRailFooterExtensions";
+import { SirisoAccountMenu } from "@editor/components/shared/siriso/SirisoAccountMenu";
+import { useSirisoPro } from "@editor/contexts/SirisoProContext";
 import "@editor/components/shared/quickNav/QuickNavRailContainer.css";
 
 export type {
@@ -51,6 +53,7 @@ export function QuickNavRailContainer({
   ...railProps
 }: QuickNavRailContainerProps) {
   const { t } = useTranslation();
+  const { isLoggedIn: sirisoSignedIn } = useSirisoPro();
   return (
     <div className="quick-nav-rail-container">
       <QuickNavBrand onReturnHome={onReturnHome} />
@@ -83,7 +86,16 @@ export function QuickNavRailContainer({
                   onClick={onOpenDocs}
                 />
               )}
-              {onOpenAccount && (
+              {/* Siriso PDF signs people in with Siriso accounts, so the avatar is that account:
+                  its menu holds the plan, settings and sign-out. The engine's own account
+                  avatar only appears for engine logins (no Siriso session). */}
+              {sirisoSignedIn || !onOpenAccount ? (
+                <SirisoAccountMenu
+                  variant="rail"
+                  onOpenSettings={onOpenAccount}
+                  settingsActive={accountActive}
+                />
+              ) : (
                 <QuickNavRailAccount
                   onOpen={onOpenAccount}
                   identity={identity}

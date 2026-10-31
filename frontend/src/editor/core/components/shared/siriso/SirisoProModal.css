@@ -150,6 +150,15 @@
   color: var(--p-siriso-orange-400);
 }
 
+/* Harga coret (promo) above the selling price */
+.siriso-pm-price-compare {
+  display: block;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--p-zinc-400);
+}
+
 .siriso-pm-perks {
   display: flex;
   flex-direction: column;
