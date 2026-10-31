@@ -142,11 +142,45 @@ function readJsonBody(req, maxBytes = 10 * 1024 * 1024) {
   });
 }
 
-const TOKEN_SECRETS = [
-  "siriso-pdf-customer-secret-2026",
-  "3a850c0f06b6bffdb6d14976051c7774",
-  "siriso_pdf_token_secret_2026",
-];
+// Tokens have to verify on the backoffice too, so sign with its secret: SIRISO_CUSTOMER_SECRET,
+// else the backoffice's data/customer-secret.json. Only a file marked source "random" counts;
+// older ones were seeded from the admin salt, which was public. With no backoffice secret this
+// server keeps its own random one, and the tokens it issues then only work here.
+const BACKOFFICE_SECRET_FILES = [
+  path.resolve(REPO_ROOT, "..", "siriso", "data", "customer-secret.json"),
+  process.env.HOME
+    ? path.join(process.env.HOME, "siriso", "data", "customer-secret.json")
+    : "",
+].filter(Boolean);
+const LOCAL_SECRET_FILE = path.join(DATA_DIR, "customer-secret.json");
+
+function readRandomSecret(file) {
+  try {
+    const rec = JSON.parse(fs.readFileSync(file, "utf8"));
+    return rec && rec.source === "random" && rec.secret ? rec.secret : null;
+  } catch {
+    return null;
+  }
+}
+
+// Read on every call, not cached: the backoffice writes its file on first use and may
+// replace it, and both servers must agree on the current one.
+function customerTokenSecret() {
+  if (process.env.SIRISO_CUSTOMER_SECRET) return process.env.SIRISO_CUSTOMER_SECRET;
+  for (const file of BACKOFFICE_SECRET_FILES) {
+    const secret = readRandomSecret(file);
+    if (secret) return secret;
+  }
+  const local = readRandomSecret(LOCAL_SECRET_FILE);
+  if (local) return local;
+  const secret = crypto.randomBytes(32).toString("hex");
+  fs.writeFileSync(
+    LOCAL_SECRET_FILE,
+    JSON.stringify({ secret, source: "random", createdAt: new Date().toISOString() }, null, 2),
+    { mode: 0o600 },
+  );
+  return secret;
+}
 
 function hashPassword(pw, salt = crypto.randomBytes(16).toString("hex")) {
   const hash = crypto.scryptSync(String(pw), salt, 64).toString("hex");
@@ -184,7 +218,7 @@ function createAuthToken(userId, email) {
     }),
   ).toString("base64url");
   const sig = crypto
-    .createHmac("sha256", TOKEN_SECRETS[0])
+    .createHmac("sha256", customerTokenSecret())
     .update(payload)
     .digest("base64url");
   return `${payload}.${sig}`;
@@ -193,18 +227,11 @@ function createAuthToken(userId, email) {
 function verifyAuthToken(token) {
   if (!token || typeof token !== "string" || !token.includes(".")) return null;
   const [payload, sig] = token.split(".");
-  let valid = false;
-  for (const sec of TOKEN_SECRETS) {
-    const expected = crypto
-      .createHmac("sha256", sec)
-      .update(payload)
-      .digest("base64url");
-    if (sig === expected) {
-      valid = true;
-      break;
-    }
-  }
-  if (!valid) return null;
+  const expected = Buffer.from(
+    crypto.createHmac("sha256", customerTokenSecret()).update(payload).digest("base64url"),
+  );
+  const given = Buffer.from(String(sig || ""));
+  if (given.length !== expected.length || !crypto.timingSafeEqual(given, expected)) return null;
   try {
     const decoded = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
     if (decoded.exp && decoded.exp < Date.now()) return null;
