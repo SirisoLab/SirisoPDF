@@ -7,8 +7,7 @@
  * here; the editor only reads them and runs them.
  */
 
-import { useState, useEffect, useRef } from "react";
-import { useAppConfig } from "@editor/contexts/AppConfigContext";
+import { useState, useEffect } from "react";
 import { useAuth } from "@editor/auth/UseSession";
 import {
   loadPolicies,
@@ -23,15 +22,8 @@ import {
 } from "@editor/services/policyBackend";
 import type { PoliciesByKey } from "@editor/types/policies";
 
-/** Cold-start reconcile retry budget + capped backoff (≈0.5s→5s, ~1 min total),
- *  enough to outlast a backend that starts a little after the frontend. */
-const RECONCILE_MAX_ATTEMPTS = 15;
-const reconcileRetryDelay = (attempt: number) =>
-  Math.min(500 * 2 ** attempt, 5000);
-
 export function usePolicies() {
   const [policies, setPolicies] = useState<PoliciesByKey>(loadPolicies);
-  const { refetch: refetchAppConfig } = useAppConfig();
   // Reconciling only on mount leaves the cache in its unconfigured default when the fetch ran
   // before there was a session, and every consumer reads that default as "no policy".
   const { user } = useAuth();
@@ -39,16 +31,10 @@ export function usePolicies() {
 
   useEffect(() => onPoliciesChange(() => setPolicies(loadPolicies())), []);
 
-  // Latest refetch, read from inside the retry loop without re-triggering it.
-  const refetchAppConfigRef = useRef(refetchAppConfig);
-  refetchAppConfigRef.current = refetchAppConfig;
-
-  // Retry with backoff since the backend may not be up yet.
-  // On recovery, also re-resolve app config in case its admin/team-leader flags settled false while down.
+  // One attempt per session: a failed fetch keeps the cached policies rather than polling a
+  // backend that may not serve this endpoint.
   useEffect(() => {
     let cancelled = false;
-    let attempt = 0;
-    let timer: ReturnType<typeof setTimeout> | undefined;
 
     const reconcile = async () => {
       let byCategory;
@@ -88,14 +74,10 @@ export function usePolicies() {
       for (const [id, state] of Object.entries(reconciled)) {
         updatePolicy(id, state);
       }
-      // The backend was down at first load (we retried) — re-resolve the app
-      // config so the admin/team-leader gate isn't stuck on its offline default.
-      if (attempt > 0) void refetchAppConfigRef.current();
     };
     void reconcile();
     return () => {
       cancelled = true;
-      if (timer) clearTimeout(timer);
     };
   }, [sessionKey]);
 
