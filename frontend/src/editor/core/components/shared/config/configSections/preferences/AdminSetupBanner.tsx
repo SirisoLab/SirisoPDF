@@ -4,16 +4,20 @@ import { Anchor, Code, Group, Paper, Stack, Text } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { ActionIcon } from "@editor/ui/ActionIcon";
 import { useAppConfig } from "@editor/contexts/AppConfigContext";
+import { useSirisoPro } from "@editor/contexts/SirisoProContext";
 
 const BANNER_DISMISSED_KEY = "stirlingpdf_features_banner_dismissed";
 
 /**
  * Shown only when login is off: the two env vars that turn on accounts, teams
- * and the admin surface. Dismissed for good once closed.
+ * and the admin surface. Dismissed for good once closed. In Siriso PDF this is
+ * operator guidance with links into the developer documentation, so only
+ * accounts with the Admin role see it.
  */
 export function AdminSetupBanner() {
   const { t } = useTranslation();
   const { config } = useAppConfig();
+  const { isAdmin } = useSirisoPro();
   const [bannerDismissed, setBannerDismissed] = useState(() => {
     // Check localStorage on mount
     return localStorage.getItem(BANNER_DISMISSED_KEY) === "true";
@@ -27,7 +31,7 @@ export function AdminSetupBanner() {
     localStorage.setItem(BANNER_DISMISSED_KEY, "true");
   };
 
-  if (!loginDisabled || bannerDismissed) {
+  if (!isAdmin || !loginDisabled || bannerDismissed) {
     return null;
   }
 

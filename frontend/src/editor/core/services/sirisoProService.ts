@@ -6,14 +6,59 @@ export interface SirisoProSubscription {
   plan: string;
   pricePaid: number;
   status: "active" | "expired" | "revoked";
-  expiresAt: string;
+  expiresAt: string | null;
   downloadsCount: number;
+}
+
+/** Account role managed from the Siriso backoffice. */
+export type SirisoRole = "user" | "staff" | "admin";
+
+/** What an account may do in the PDF app (computed by the server, mirrored by computeAccess). */
+export interface SirisoAccess {
+  workspace: boolean;
+  adFree: boolean;
+  desktop: boolean;
+  admin: boolean;
+}
+
+/** Who may open the workspace, set from the backoffice "Harga & Akses" page. */
+export interface SirisoAccessPolicy {
+  workspaceRequiresPro: boolean;
+}
+
+export interface SirisoFreePlan {
+  name: string;
+  priceLabel: string;
+  periodLabel: string;
+  description: string;
+  ctaLabel: string;
+  features: string[];
+}
+
+/** Paket Pro as configured in the backoffice: billed through QRIS and shown on the landing page. */
+export interface SirisoPricing {
+  name: string;
+  price: number;
+  compareAtPrice: number;
+  period: string;
+  planDays: number;
+  formattedPrice: string;
+  formattedCompareAt: string;
+  badge: string;
+  tagline: string;
+  promoLabel: string;
+  description: string;
+  ctaLabel: string;
+  features: string[];
+  free: SirisoFreePlan;
 }
 
 export interface SirisoProUser {
   id: string;
   name: string;
   email: string;
+  role?: SirisoRole;
+  access?: SirisoAccess;
   isPro: boolean;
   proStatus: "free" | "pending" | "active" | "expired";
   proExpiresAt?: string | null;
@@ -50,6 +95,7 @@ export interface SirisoProState {
   isPro: boolean;
   authToken?: string;
   userId?: string;
+  role?: SirisoRole;
   proStatus?: "free" | "pending" | "active" | "expired";
   licenseKey?: string;
   desktopActivationCode?: string;
@@ -92,26 +138,45 @@ export interface SirisoAdsConfig {
 }
 
 const STORAGE_KEY = "siriso_pro_auth_v1";
+/** Exported so other tabs can follow sign-in / sign-out through the storage event. */
+export const SIRISO_AUTH_STORAGE_KEY = STORAGE_KEY;
+const PUBLIC_CONFIG_KEY = "siriso_public_config_v1";
 
 let cachedBackofficeBase: string | null = null;
 
+/** A page served from this machine or the LAN (dev / Termux) — the only case where probing :8000 makes sense. */
+function isLocalHost(host: string): boolean {
+  return (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "[::1]" ||
+    host.endsWith(".local") ||
+    /^(10|192\.168)\./.test(host) ||
+    /^172\.(1[6-9]|2\d|3[01])\./.test(host)
+  );
+}
+
+/**
+ * Where the Siriso backoffice API lives. VITE_SIRISO_API_BASE pins it for a deployment;
+ * otherwise the page's own origin (reverse proxy) is tried, then a backoffice on :8000 when
+ * running locally, then sirisolab.com. Public visitors never get probes to localhost.
+ */
 function getBackofficeCandidates(): string[] {
   const host = globalThis.location?.hostname || "localhost";
   const protocol = globalThis.location?.protocol || "http:";
   const origin = globalThis.location?.origin || "http://localhost:5000";
+  const configured = String(import.meta.env.VITE_SIRISO_API_BASE || "")
+    .trim()
+    .replace(/\/+$/, "");
   const candidates: string[] = [];
 
-  if (cachedBackofficeBase !== null) {
-    candidates.push(cachedBackofficeBase);
-  }
-
+  if (configured) return [configured];
+  if (cachedBackofficeBase !== null) candidates.push(cachedBackofficeBase);
   candidates.push(origin);
-
-  if (protocol === "http:") {
-    candidates.push(`http://${host}:8000`);
+  if (isLocalHost(host)) {
+    if (protocol === "http:") candidates.push(`http://${host}:8000`);
+    candidates.push("http://localhost:8000");
   }
-
-  candidates.push("http://localhost:8000");
   candidates.push("https://sirisolab.com");
 
   return Array.from(new Set(candidates));
@@ -151,12 +216,7 @@ async function fetchSirisoApi(
 
 function getActiveBackofficeBase(): string {
   if (cachedBackofficeBase !== null) return cachedBackofficeBase;
-  const host = globalThis.location?.hostname || "localhost";
-  const protocol = globalThis.location?.protocol || "http:";
-  if (protocol === "http:") {
-    return `http://${host}:8000`;
-  }
-  return globalThis.location?.origin || "https://sirisolab.com";
+  return getBackofficeCandidates()[0];
 }
 
 export const DEFAULT_ADS_CONFIG: SirisoAdsConfig = {
@@ -214,6 +274,138 @@ export const DEFAULT_ADS_CONFIG: SirisoAdsConfig = {
   priceFormatted: "Rp 25.000 / bulan",
   priceMonthly: 25000,
 };
+
+export const DEFAULT_PRICING: SirisoPricing = {
+  name: "Paket Pro",
+  price: 25000,
+  compareAtPrice: 0,
+  period: "bulan",
+  planDays: 30,
+  formattedPrice: "Rp 25.000 / bulan",
+  formattedCompareAt: "",
+  badge: "SIRISO PDF PAKET PRO",
+  tagline: "BEBAS IKLAN + DESKTOP WINDOWS",
+  promoLabel: "",
+  description:
+    "Kerja dokumen PDF tanpa iklan sekaligus akses aplikasi Siriso PDF Desktop untuk Windows.",
+  ctaLabel: "Upgrade ke Paket Pro",
+  features: [
+    "100% bebas iklan di seluruh Workspace web",
+    "Unduh Siriso PDF Desktop (Windows x64) + kode aktivasi offline",
+    "Siriso Office Convert, OCR multi-bahasa, tanda tangan sertifikat & otomatisasi",
+    "Satu akun untuk web dan aplikasi desktop",
+  ],
+  free: {
+    name: "Akses Web Standar",
+    priceLabel: "Gratis",
+    periodLabel: "/ selamanya di browser",
+    description:
+      "Untuk kebutuhan PDF harian langsung dari browser tanpa instalasi.",
+    ctaLabel: "Mulai gratis",
+    features: [
+      "Alat PDF utama: gabung, pisah, kompres, putar, baca & anotasi",
+      "Alur kerja multi-alat langsung di browser",
+      "Cukup daftar akun gratis untuk membuka Workspace",
+      "Didukung iklan resmi Google AdSense",
+    ],
+  },
+};
+
+export const DEFAULT_ACCESS_POLICY: SirisoAccessPolicy = {
+  workspaceRequiresPro: true,
+};
+
+export interface SirisoPublicConfig {
+  ads: SirisoAdsConfig;
+  pricing: SirisoPricing;
+  access: SirisoAccessPolicy;
+}
+
+/**
+ * The client-side twin of the server's access rule. Tim/Admin roles get everything; customers
+ * get the workspace with an active Pro plan, or with any account when the policy allows it.
+ */
+export function computeAccess(
+  state: SirisoProState,
+  policy: SirisoAccessPolicy,
+): SirisoAccess {
+  const privileged = state.role === "staff" || state.role === "admin";
+  const loggedIn = Boolean(state.authToken || state.customerEmail);
+  const isPro = Boolean(state.isPro);
+  return {
+    workspace:
+      privileged || isPro || (!policy.workspaceRequiresPro && loggedIn),
+    adFree: privileged || isPro,
+    desktop: privileged || isPro,
+    admin: state.role === "admin",
+  };
+}
+
+const asText = (v: unknown, fallback: string): string =>
+  typeof v === "string" && v.trim() ? v.trim() : fallback;
+const asList = (v: unknown, fallback: string[]): string[] =>
+  Array.isArray(v)
+    ? v.filter((x): x is string => typeof x === "string" && x.trim() !== "")
+    : fallback;
+
+function normalizePricing(
+  raw: Record<string, unknown> | undefined,
+): SirisoPricing {
+  const p = raw || {};
+  const d = DEFAULT_PRICING;
+  const price = Number(p.price);
+  const compareAt = Number(p.compareAtPrice);
+  const free = (p.free || {}) as Record<string, unknown>;
+  const validPrice = Number.isFinite(price) && price > 0 ? price : d.price;
+  const period = asText(p.period, d.period);
+  return {
+    name: asText(p.name, d.name),
+    price: validPrice,
+    compareAtPrice:
+      Number.isFinite(compareAt) && compareAt > validPrice ? compareAt : 0,
+    period,
+    planDays: Number(p.planDays) > 0 ? Number(p.planDays) : d.planDays,
+    formattedPrice: asText(
+      p.formattedPrice,
+      `Rp ${validPrice.toLocaleString("id-ID")} / ${period}`,
+    ),
+    formattedCompareAt: asText(p.formattedCompareAt, ""),
+    badge: asText(p.badge, d.badge),
+    tagline: asText(p.tagline, d.tagline),
+    promoLabel: asText(p.promoLabel, ""),
+    description: asText(p.description, d.description),
+    ctaLabel: asText(p.ctaLabel, d.ctaLabel),
+    features: asList(p.features, d.features),
+    free: {
+      name: asText(free.name, d.free.name),
+      priceLabel: asText(free.priceLabel, d.free.priceLabel),
+      periodLabel: asText(free.periodLabel, d.free.periodLabel),
+      description: asText(free.description, d.free.description),
+      ctaLabel: asText(free.ctaLabel, d.free.ctaLabel),
+      features: asList(free.features, d.free.features),
+    },
+  };
+}
+
+/** Last config seen, so the landing page shows the real price before the network answers. */
+export function getCachedPublicConfig(): SirisoPublicConfig | null {
+  try {
+    const raw = localStorage.getItem(PUBLIC_CONFIG_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<SirisoPublicConfig>;
+    return {
+      ads: DEFAULT_ADS_CONFIG,
+      pricing: normalizePricing(
+        parsed.pricing as unknown as Record<string, unknown>,
+      ),
+      access: {
+        workspaceRequiresPro: parsed.access?.workspaceRequiresPro !== false,
+      },
+    };
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Only allow official Google AdSense units with a valid publisher client ID
@@ -275,6 +467,7 @@ export function mapUserToProState(
     isPro: Boolean(user.isPro),
     authToken,
     userId: user.id,
+    role: user.role === "staff" || user.role === "admin" ? user.role : "user",
     proStatus: user.proStatus,
     customerName: user.name,
     customerEmail: user.email,
@@ -305,15 +498,41 @@ function normalizeQrisOrder(
   return order;
 }
 
-export async function fetchSirisoAdsConfig(): Promise<SirisoAdsConfig> {
+/** Public Siriso PDF config: ad slots, Paket Pro pricing and the workspace access policy. Null when unreachable. */
+export async function fetchSirisoPublicConfig(): Promise<SirisoPublicConfig | null> {
   try {
     const response = await fetchSirisoApi("/api/siriso-pdf/config", {
       method: "GET",
       headers: { Accept: "application/json" },
     });
-    if (!response.ok) return DEFAULT_ADS_CONFIG;
+    if (!response.ok) return null;
     const data = await response.json();
-    const rawAds = data.ads || {};
+    const pricing = normalizePricing(data.pricing);
+    const access: SirisoAccessPolicy = {
+      workspaceRequiresPro: data.access?.workspaceRequiresPro !== false,
+    };
+    try {
+      localStorage.setItem(
+        PUBLIC_CONFIG_KEY,
+        JSON.stringify({ pricing, access }),
+      );
+    } catch {
+      // storage is a convenience only
+    }
+    return { ads: parseAdsConfig(data, pricing), pricing, access };
+  } catch {
+    return null;
+  }
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any -- raw JSON from the backoffice */
+function parseAdsConfig(
+  data: { ads?: Record<string, any> },
+  pricing: SirisoPricing,
+): SirisoAdsConfig {
+  // Ad slots are rebuilt field by field so unexpected keys never reach the DOM.
+  {
+    const rawAds: Record<string, any> = data.ads || {};
     const rawSticky = rawAds.bottomSticky || {};
     const rawSidebar = rawAds.rightSidebar || {};
     const rawCorner = rawAds.floatingCorner || {};
@@ -373,19 +592,12 @@ export async function fetchSirisoAdsConfig(): Promise<SirisoAdsConfig> {
       actionUrl:
         rawAds.linkUrl ?? rawAds.actionUrl ?? DEFAULT_ADS_CONFIG.actionUrl,
       position: rawAds.position ?? "bottom",
-      priceFormatted:
-        data.pricing?.formattedPrice ??
-        data.pricing?.formatted ??
-        DEFAULT_ADS_CONFIG.priceFormatted,
-      priceMonthly:
-        data.pricing?.price ??
-        data.pricing?.monthlyPrice ??
-        DEFAULT_ADS_CONFIG.priceMonthly,
+      priceFormatted: pricing.formattedPrice,
+      priceMonthly: pricing.price,
     };
-  } catch {
-    return DEFAULT_ADS_CONFIG;
   }
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export async function loginSirisoAccount(
   email: string,
@@ -470,29 +682,39 @@ export async function registerSirisoAccount(
   }
 }
 
+/**
+ * `invalid` means the server rejected the session (expired/forged token, deleted account) and it
+ * must be dropped; a network failure leaves `invalid` false so a temporary outage does not sign
+ * anyone out.
+ */
 export async function fetchSirisoAccountMe(token: string): Promise<{
   success: boolean;
+  invalid: boolean;
   user?: SirisoProUser;
 }> {
-  if (!token) return { success: false };
+  if (!token) return { success: false, invalid: true };
   try {
-    const response = await fetchSirisoApi(
-      `/api/siriso-pdf/auth/me?token=${encodeURIComponent(token)}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+    const response = await fetchSirisoApi("/api/siriso-pdf/auth/me", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
       },
-    );
+    });
+    if (
+      response.status === 401 ||
+      response.status === 403 ||
+      response.status === 404
+    ) {
+      return { success: false, invalid: true };
+    }
     const data = await response.json();
     if (response.ok && data.ok && data.user) {
-      return { success: true, user: data.user };
+      return { success: true, invalid: false, user: data.user };
     }
-    return { success: false };
+    return { success: false, invalid: false };
   } catch {
-    return { success: false };
+    return { success: false, invalid: false };
   }
 }
 
@@ -589,10 +811,11 @@ export async function fetchSirisoQrisPaymentStatus(
 }> {
   if (!token) return { success: false };
   try {
-    const params = new URLSearchParams({ token });
+    const params = new URLSearchParams();
     if (orderId) params.set("orderId", orderId);
+    const query = params.toString();
     const response = await fetchSirisoApi(
-      `/api/siriso-pdf/payment/status?${params.toString()}`,
+      `/api/siriso-pdf/payment/status${query ? `?${query}` : ""}`,
       {
         method: "GET",
         headers: {
@@ -668,6 +891,8 @@ export async function confirmSirisoQrisPayment(
 export async function verifySirisoLicense(licenseKey: string): Promise<{
   success: boolean;
   message: string;
+  /** True when the server could not be reached, as opposed to rejecting the code. */
+  networkError?: boolean;
   subscription?: SirisoProSubscription;
 }> {
   const cleanKey = (licenseKey || "").trim().toUpperCase();
@@ -701,11 +926,10 @@ export async function verifySirisoLicense(licenseKey: string): Promise<{
             customerEmail: data.email || data.customerEmail || "",
             licenseKey: data.licenseKey || cleanKey,
             plan: data.plan || "Paket Pro (Desktop Offline)",
-            pricePaid: data.price || 25000,
+            pricePaid: data.price || 0,
             status: "active",
-            expiresAt:
-              data.expiresAt ||
-              new Date(Date.now() + 30 * 86400000).toISOString(),
+            // Never invent an expiry: null means the server granted open-ended access (Tim/Admin)
+            expiresAt: data.expiresAt || null,
             downloadsCount: data.downloadsCount || 0,
           }
         : undefined);
@@ -727,18 +951,16 @@ export async function verifySirisoLicense(licenseKey: string): Promise<{
   } catch {
     return {
       success: false,
+      networkError: true,
       message: "Tidak dapat menghubungi layanan verifikasi Siriso.",
     };
   }
 }
 
-export function getSirisoDesktopDownloadUrl(
-  licenseKey?: string,
-  authToken?: string,
-): string {
+/** The desktop code alone authorises the download, so the session token never ends up in a URL. */
+export function getSirisoDesktopDownloadUrl(licenseKey?: string): string {
   const params = new URLSearchParams();
   if (licenseKey) params.set("key", licenseKey);
-  if (authToken) params.set("token", authToken);
   const query = params.toString();
   return `${getActiveBackofficeBase()}/api/siriso-pdf/download-desktop${query ? `?${query}` : ""}`;
 }

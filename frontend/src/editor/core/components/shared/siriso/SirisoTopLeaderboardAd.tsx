@@ -5,12 +5,12 @@ import { SirisoAdSlot } from "@editor/components/shared/siriso/SirisoAdSlot";
 import { isOfficialGoogleAdSlot } from "@editor/services/sirisoProService";
 
 export function SirisoTopLeaderboardAd() {
-  const { isPro, adsConfig, openProModal } = useSirisoPro();
+  const { isAdFree, adsConfig, openProModal } = useSirisoPro();
   const [dismissed, setDismissed] = useState(false);
 
   const slot = adsConfig.topLeaderboard;
   if (
-    isPro ||
+    isAdFree ||
     !adsConfig.enabled ||
     !isOfficialGoogleAdSlot(slot) ||
     dismissed
@@ -29,7 +29,8 @@ export function SirisoTopLeaderboardAd() {
         justifyContent: "center",
         padding: "6px 12px 10px",
         background: "var(--c-surface-1, #1a1b23)",
-        borderBottom: "1px solid var(--c-border-subtle, rgba(255,255,255,0.08))",
+        borderBottom:
+          "1px solid var(--c-border-subtle, rgba(255,255,255,0.08))",
         width: "100%",
         position: "relative",
       }}

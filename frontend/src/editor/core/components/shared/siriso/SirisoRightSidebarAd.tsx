@@ -5,12 +5,12 @@ import { SirisoAdSlot } from "@editor/components/shared/siriso/SirisoAdSlot";
 import { isOfficialGoogleAdSlot } from "@editor/services/sirisoProService";
 
 export function SirisoRightSidebarAd() {
-  const { isPro, adsConfig, openProModal } = useSirisoPro();
+  const { isAdFree, adsConfig, openProModal } = useSirisoPro();
   const [dismissed, setDismissed] = useState(false);
 
   const slot = adsConfig.rightSidebar;
   if (
-    isPro ||
+    isAdFree ||
     !adsConfig.enabled ||
     !isOfficialGoogleAdSlot(slot) ||
     dismissed
@@ -46,79 +46,79 @@ export function SirisoRightSidebarAd() {
           overflow: "hidden",
         }}
       >
-      {/* Header with ADVERTISEMENT badge & Close button */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "4px 8px",
-          background: "rgba(28, 31, 40, 0.98)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
-          fontSize: "0.68rem",
-          color: "#94a3b8",
-        }}
-      >
-        <span
+        {/* Header with ADVERTISEMENT badge & Close button */}
+        <div
           style={{
-            fontWeight: 700,
-            letterSpacing: "0.6px",
-            textTransform: "uppercase",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "4px 8px",
+            background: "rgba(28, 31, 40, 0.98)",
+            borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+            fontSize: "0.68rem",
+            color: "#94a3b8",
           }}
         >
-          {slot.badge || "ADVERTISEMENT"}
-        </span>
+          <span
+            style={{
+              fontWeight: 700,
+              letterSpacing: "0.6px",
+              textTransform: "uppercase",
+            }}
+          >
+            {slot.badge || "ADVERTISEMENT"}
+          </span>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <button
-            type="button"
-            onClick={openProModal}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#f59f00",
-              cursor: "pointer",
-              fontSize: "0.68rem",
-              textDecoration: "underline",
-              padding: 0,
-            }}
-            title="Hilangkan iklan dengan Paket Pro"
-          >
-            Bebas Iklan
-          </button>
-          <button
-            type="button"
-            onClick={() => setDismissed(true)}
-            aria-label="Tutup iklan"
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "#94a3b8",
-              cursor: "pointer",
-              padding: "2px",
-              display: "inline-flex",
-            }}
-            title="Tutup banner iklan"
-          >
-            <Icon name="x" size="0.9rem" />
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <button
+              type="button"
+              onClick={openProModal}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#f59f00",
+                cursor: "pointer",
+                fontSize: "0.68rem",
+                textDecoration: "underline",
+                padding: 0,
+              }}
+              title="Hilangkan iklan dengan Paket Pro"
+            >
+              Bebas Iklan
+            </button>
+            <button
+              type="button"
+              onClick={() => setDismissed(true)}
+              aria-label="Tutup iklan"
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "#94a3b8",
+                cursor: "pointer",
+                padding: "2px",
+                display: "inline-flex",
+              }}
+              title="Tutup banner iklan"
+            >
+              <Icon name="x" size="0.9rem" />
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Ad content: 300x600 or 300x250 */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "6px",
-          maxHeight: "600px",
-          overflow: "hidden",
-        }}
-      >
-        <SirisoAdSlot slot={slot} maxHeight={600} />
-      </div>
-    </aside>
-  </>
+        {/* Ad content: 300x600 or 300x250 */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "6px",
+            maxHeight: "600px",
+            overflow: "hidden",
+          }}
+        >
+          <SirisoAdSlot slot={slot} maxHeight={600} />
+        </div>
+      </aside>
+    </>
   );
 }

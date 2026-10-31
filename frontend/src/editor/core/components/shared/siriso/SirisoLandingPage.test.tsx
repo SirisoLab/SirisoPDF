@@ -1,16 +1,26 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SirisoLandingPage } from "@editor/components/shared/siriso/SirisoLandingPage";
 import { SirisoProModal } from "@editor/components/shared/siriso/SirisoProModal";
+import {
+  DEFAULT_ACCESS_POLICY,
+  DEFAULT_PRICING,
+} from "@editor/services/sirisoProService";
 
 const mocks = vi.hoisted(() => ({
   enterWorkspace: vi.fn((cb?: () => void) => cb?.()),
   openProModal: vi.fn(),
   closeProModal: vi.fn(),
+  openLandingPage: vi.fn(),
   loginAccount: vi.fn().mockResolvedValue({ success: true, message: "OK" }),
   registerAccount: vi.fn().mockResolvedValue({ success: true, message: "OK" }),
-  requestProUpgrade: vi.fn().mockResolvedValue({ success: true, message: "OK" }),
+  requestProUpgrade: vi
+    .fn()
+    .mockResolvedValue({ success: true, message: "OK" }),
+  createQrisPayment: vi
+    .fn()
+    .mockResolvedValue({ success: true, message: "OK" }),
   logoutAccount: vi.fn(),
   activateLicense: vi.fn().mockResolvedValue({ success: true, message: "OK" }),
   refreshStatus: vi.fn().mockResolvedValue(undefined),
@@ -19,30 +29,43 @@ const mocks = vi.hoisted(() => ({
   addFiles: vi.fn().mockResolvedValue(undefined),
 }));
 
-let mockContextState: Record<string, any> = {};
+let mockContextState: Record<string, unknown> = {};
 
-vi.mock("@editor/contexts/SirisoProContext", () => ({
-  useSirisoPro: () => ({
-    isPro: false,
-    isLoggedIn: false,
-    proState: { isPro: false },
-    adsConfig: { priceFormatted: "Rp 25.000 / bulan" },
-    activeQrisOrder: undefined,
-    isProModalOpen: true,
-    pendingWorkspaceEntry: true,
-    openProModal: mocks.openProModal,
-    closeProModal: mocks.closeProModal,
-    loginAccount: mocks.loginAccount,
-    registerAccount: mocks.registerAccount,
-    requestProUpgrade: mocks.requestProUpgrade,
-    logoutAccount: mocks.logoutAccount,
-    activateLicense: mocks.activateLicense,
-    refreshStatus: mocks.refreshStatus,
-    isChecking: false,
-    enterWorkspace: mocks.enterWorkspace,
-    ...mockContextState,
-  }),
-}));
+vi.mock("@editor/contexts/SirisoProContext", async () => {
+  const service = await vi.importActual<
+    typeof import("@editor/services/sirisoProService")
+  >("@editor/services/sirisoProService");
+  return {
+    useSirisoPro: () => ({
+      isPro: false,
+      isLoggedIn: false,
+      role: "user",
+      isAdmin: false,
+      canUseWorkspace: false,
+      isAdFree: false,
+      proState: { isPro: false },
+      adsConfig: service.DEFAULT_ADS_CONFIG,
+      pricing: service.DEFAULT_PRICING,
+      accessPolicy: service.DEFAULT_ACCESS_POLICY,
+      activeQrisOrder: undefined,
+      isProModalOpen: true,
+      pendingWorkspaceEntry: true,
+      openProModal: mocks.openProModal,
+      closeProModal: mocks.closeProModal,
+      openLandingPage: mocks.openLandingPage,
+      loginAccount: mocks.loginAccount,
+      registerAccount: mocks.registerAccount,
+      requestProUpgrade: mocks.requestProUpgrade,
+      createQrisPayment: mocks.createQrisPayment,
+      logoutAccount: mocks.logoutAccount,
+      activateLicense: mocks.activateLicense,
+      refreshStatus: mocks.refreshStatus,
+      isChecking: false,
+      enterWorkspace: mocks.enterWorkspace,
+      ...mockContextState,
+    }),
+  };
+});
 
 vi.mock("@editor/contexts/QuickNavHostContext", () => ({
   useSuppressQuickNavRail: vi.fn(),
@@ -63,17 +86,22 @@ vi.mock("@editor/contexts/file/fileHooks", () => ({
   }),
 }));
 
+function renderLanding() {
+  return render(
+    <MemoryRouter initialEntries={["/"]}>
+      <SirisoLandingPage />
+    </MemoryRouter>,
+  );
+}
+
 describe("SirisoLandingPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockContextState = {};
   });
 
   it("renders hero, feature explanations, and sirisolab.com branding", () => {
-    render(
-      <MemoryRouter initialEntries={["/"]}>
-        <SirisoLandingPage />
-      </MemoryRouter>,
-    );
+    renderLanding();
 
     expect(screen.getByTestId("siriso-landing-page")).toBeInTheDocument();
     expect(
@@ -93,11 +121,7 @@ describe("SirisoLandingPage", () => {
   });
 
   it("filters features by category and launches selected tool into workspace", () => {
-    render(
-      <MemoryRouter initialEntries={["/"]}>
-        <SirisoLandingPage />
-      </MemoryRouter>,
-    );
+    renderLanding();
 
     const securityTab = screen.getByRole("tab", {
       name: /Keamanan & Tanda Tangan/i,
@@ -121,18 +145,79 @@ describe("SirisoLandingPage", () => {
   });
 
   it("enters workspace when primary CTA is clicked", () => {
-    render(
-      <MemoryRouter initialEntries={["/"]}>
-        <SirisoLandingPage />
-      </MemoryRouter>,
-    );
+    renderLanding();
 
     fireEvent.click(screen.getByTestId("landing-open-workspace-hero"));
     expect(mocks.enterWorkspace).toHaveBeenCalledTimes(1);
   });
 
+  it("shows the Pro price, promo and features configured in the backoffice", () => {
+    mockContextState = {
+      pricing: {
+        ...DEFAULT_PRICING,
+        name: "Paket Pro",
+        price: 19000,
+        compareAtPrice: 29000,
+        formattedPrice: "Rp 19.000 / bulan",
+        formattedCompareAt: "Rp 29.000 / bulan",
+        promoLabel: "Hemat 34%",
+        features: ["Bebas iklan", "Aplikasi desktop"],
+      },
+    };
+    renderLanding();
+
+    const pro = screen.getByTestId("landing-pro-plan");
+    expect(screen.getByTestId("landing-pro-price")).toHaveTextContent(
+      "Rp 19.000 / bulan",
+    );
+    expect(screen.getByTestId("landing-pro-compare")).toHaveTextContent(
+      "Rp 29.000 / bulan",
+    );
+    expect(within(pro).getByText("Hemat 34%")).toBeInTheDocument();
+    expect(within(pro).getByText("Aplikasi desktop")).toBeInTheDocument();
+    // FAQ follows the same price instead of a hard-coded one
+    expect(
+      screen.getByText(/Paket Pro \(Rp 19\.000 \/ bulan\)\?/),
+    ).toBeInTheDocument();
+  });
+
+  it("hides the free plan while the workspace requires Pro, and shows it in free mode", () => {
+    const { unmount } = renderLanding();
+    expect(screen.queryByTestId("landing-free-plan")).not.toBeInTheDocument();
+    unmount();
+
+    mockContextState = {
+      accessPolicy: { ...DEFAULT_ACCESS_POLICY, workspaceRequiresPro: false },
+    };
+    renderLanding();
+    expect(screen.getByTestId("landing-free-plan")).toHaveTextContent(
+      DEFAULT_PRICING.free.name,
+    );
+  });
+
+  it("gives a signed-in visitor an account menu that signs out", () => {
+    mockContextState = {
+      isLoggedIn: true,
+      proState: {
+        isPro: false,
+        customerName: "Hanz PM",
+        customerEmail: "hanz@example.com",
+      },
+    };
+    renderLanding();
+
+    expect(
+      screen.queryByTestId("landing-open-pro-modal"),
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("landing-account-button"));
+    const menu = screen.getByTestId("siriso-account-menu");
+    expect(within(menu).getByText("hanz@example.com")).toBeInTheDocument();
+    fireEvent.click(within(menu).getByTestId("siriso-account-logout"));
+    expect(mocks.logoutAccount).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId("siriso-account-menu")).not.toBeInTheDocument();
+  });
+
   it("renders SirisoProModal with account login/register and no Backoffice link", () => {
-    mockContextState = { isLoggedIn: false, isPro: false };
     render(<SirisoProModal />);
 
     expect(screen.getByTestId("siriso-pro-modal")).toBeInTheDocument();
@@ -181,10 +266,30 @@ describe("SirisoLandingPage", () => {
     expect(screen.getByTestId("siriso-refresh-status-btn")).toBeInTheDocument();
   });
 
-  it("unlocks workspace entry and desktop download button when user is active Pro", () => {
+  it("lets a free account into the workspace when the backoffice allows free access", () => {
+    mockContextState = {
+      isLoggedIn: true,
+      canUseWorkspace: true,
+      accessPolicy: { ...DEFAULT_ACCESS_POLICY, workspaceRequiresPro: false },
+      proState: { isPro: false, customerEmail: "free@example.com" },
+    };
+
+    render(<SirisoProModal />);
+
+    expect(
+      screen.queryByTestId("siriso-workspace-locked-banner"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByTestId("siriso-modal-enter-workspace-btn"),
+    ).toBeInTheDocument();
+  });
+
+  it("unlocks workspace entry, desktop download and renewal when user is active Pro", () => {
     mockContextState = {
       isLoggedIn: true,
       isPro: true,
+      isAdFree: true,
+      canUseWorkspace: true,
       proState: {
         isPro: true,
         proStatus: "active",
@@ -202,9 +307,39 @@ describe("SirisoLandingPage", () => {
     expect(
       screen.getByTestId("siriso-download-desktop-btn"),
     ).toBeInTheDocument();
+    expect(screen.getByTestId("siriso-renew-btn")).toBeInTheDocument();
     expect(
       screen.queryByTestId("siriso-workspace-locked-banner"),
     ).not.toBeInTheDocument();
   });
-});
 
+  it("treats a Tim/Admin role as full access without a subscription", () => {
+    mockContextState = {
+      isLoggedIn: true,
+      isPro: false,
+      isAdFree: true,
+      canUseWorkspace: true,
+      role: "staff",
+      proState: {
+        isPro: false,
+        role: "staff",
+        customerName: "Tim Siriso",
+        customerEmail: "tim@sirisolab.com",
+        desktopActivationCode: "SRP-DESK-TEAM",
+      },
+    };
+
+    render(<SirisoProModal />);
+
+    expect(screen.getByTestId("siriso-account-status")).toHaveTextContent(
+      /Akses Penuh · Tim Siriso/,
+    );
+    expect(
+      screen.getByTestId("siriso-download-desktop-btn"),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId("siriso-renew-btn")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("siriso-qris-gateway-card"),
+    ).not.toBeInTheDocument();
+  });
+});

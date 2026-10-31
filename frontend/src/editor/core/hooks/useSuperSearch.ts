@@ -277,10 +277,14 @@ export function rankToolResults(
 ): SuperSearchResult[] {
   if (!trimmed) return [];
   // Coming-soon placeholders are listed in the catalogue but can't open —
-  // selecting one would land on the "tool not found" panel.
+  // selecting one would land on the "tool not found" panel. Tools kept out of
+  // the tool list (pipeline-only steps, admin-only links) stay out of search too.
   const entries = (
     Object.entries(registry) as [ToolId, ToolRegistry[ToolId] | undefined][]
-  ).filter(([id, tool]) => tool && !isComingSoonTool(id, tool));
+  ).filter(
+    ([id, tool]) =>
+      tool && !tool.hiddenFromToolList && !isComingSoonTool(id, tool),
+  );
   return rankByFuzzy(entries, trimmed, [
     ([id]) => idToWords(id),
     ([, v]) => v?.name ?? "",
