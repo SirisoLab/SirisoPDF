@@ -30,7 +30,7 @@ RUN set -eu; \
     npx vite build editor --mode "${VITE_BUILD_MODE}"
 
 # Stage 2: nginx
-FROM nginx:alpine@sha256:b0f7830b6bfaa1258f45d94c240ab668ced1b3651c8a222aefe6683447c7bf55
+FROM nginx:alpine@sha256:785835ea65db4bba6f021acc0f3be91b0fef76a53fe41f8588c6698d2aed0606
 
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY docker/frontend/nginx.conf /etc/nginx/nginx.conf
